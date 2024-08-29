@@ -1,0 +1,44 @@
+#!/usr/bin/env python3
+ 
+import argparse
+import sqlite3
+
+parser = argparse.ArgumentParser(description="Create SQLite database with proper columns")
+parser.add_argument(
+    "dest_file", metavar="sqlite.db", help="SQLite DB"
+)
+args = parser.parse_args()
+
+conn = sqlite3.connect(args.dest_file)
+cursor = conn.cursor()
+
+cursor.execute(
+    """
+CREATE TABLE IF NOT EXISTS Words (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    word TEXT,
+    language TEXT,
+    class TEXT,
+    comment TEXT,
+    translation TEXT,
+    explanation TEXT,
+    example TEXT,
+    grammar TEXT,
+    idiom TEXT,
+    variant TEXT,
+    paradigm TEXT,
+    related TEXT,
+    see TEXT,
+    definition TEXT,
+    synonym TEXT,
+    phonetic TEXT,
+    compound TEXT,
+    url TEXT,
+    derivation TEXT,
+    use TEXT
+)
+"""
+)
+
+conn.commit()
+conn.close()
