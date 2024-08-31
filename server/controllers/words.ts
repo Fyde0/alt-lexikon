@@ -1,6 +1,5 @@
 import { Request, Response } from "express"
 // 
-import log from "../helpers/log"
 import { file_db } from ".."
 import { IWordLang } from "../interfaces/word"
 
@@ -31,8 +30,8 @@ function searchWords(req: Request, res: Response) {
         return a.word.length - b.word.length
     })
 
-    // only 20 results
-    results.splice(20)
+    // only 6 results
+    results.splice(6)
 
     return res.status(200).json(results)
 }
