@@ -1,4 +1,5 @@
 import { AppShell, Flex, Group, Title } from "@mantine/core"
+import SearchInput from "../components/SearchInput"
 
 function Root() {
 
@@ -20,7 +21,9 @@ function Root() {
                 </Group>
             </AppShell.Header>
 
-            <AppShell.Main>Main</AppShell.Main>
+            <AppShell.Main>
+                <SearchInput />
+            </AppShell.Main>
 
         </AppShell>
     )
