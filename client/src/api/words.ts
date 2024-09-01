@@ -1,14 +1,18 @@
 import { queryOptions, useQuery } from "@tanstack/react-query"
+import { isIWordLangArray, IWordLang } from "../interfaces/word"
 
 export function searchWords({ query }: { query: string }) {
     return useQuery(queryOptions({
         queryKey: ["words", query],
-        queryFn: async () => {
-            const url = import.meta.env.VITE_API_URL + "/words/?query=" + query
-            return fetch(url)
+        queryFn: async (): Promise<IWordLang[]> => {
+
+            const url = new URL(import.meta.env.VITE_API_URL + "/words/")
+            url.searchParams.append("query", query)
+
+            return fetch(url.toString())
                 .then(async (response) => {
                     const data = await response.json()
-                    if (response.ok) {
+                    if (response.ok && isIWordLangArray(data)) {
                         return data
                     }
                     throw new Error(data.error)

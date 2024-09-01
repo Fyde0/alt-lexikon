@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { Button, Combobox, Grid, Loader, TextInput, useCombobox } from "@mantine/core";
 // 
 import { searchWords } from "../api/words";
+import { IWordLang } from "../interfaces/word";
 
 function SearchInput() {
     const [query, setQuery] = useState<string>("")
@@ -61,7 +62,7 @@ function SearchInput() {
                     <Combobox.Options>
                         {wordsQuery.data.length === 0 && <Combobox.Empty>No results found</Combobox.Empty>}
                         {
-                            wordsQuery.data.map((item: any, i: number) => (
+                            wordsQuery.data.map((item, i) => (
                                 <Combobox.Option value={item.word} key={i}>
                                     {item.language === "en" ? "🇬🇧" : "🇸🇪"} {item.word}
                                 </Combobox.Option>
