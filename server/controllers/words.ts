@@ -2,7 +2,7 @@ import { Request, Response } from "express"
 import { z } from "zod"
 // 
 import { file_db } from ".."
-import { isIWordLangArray } from "../interfaces/word"
+import { isIWordArray, isIWordLangArray } from "../interfaces/word"
 import { serverError } from "../helpers/serverError"
 import { logDebug } from "../helpers/log"
 
@@ -71,8 +71,8 @@ function specificWord(req: Request, res: Response) {
         .prepare(sqlQuery)
         .all(parameters)
 
-    if (!isIWordLangArray(results)) {
-        return serverError(res, "Invalid object from DB in searchWords function.")
+    if (!isIWordArray(results)) {
+        return serverError(res, "Invalid object from DB in specificWord function.")
     }
 
     // TODO sort

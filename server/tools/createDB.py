@@ -20,22 +20,9 @@ CREATE TABLE IF NOT EXISTS Words (
     language TEXT,
     class TEXT,
     comment TEXT,
-    translation TEXT,
-    explanation TEXT,
-    example TEXT,
-    grammar TEXT,
-    idiom TEXT,
-    variant TEXT,
-    paradigm TEXT,
-    related TEXT,
-    see TEXT,
-    definition TEXT,
-    synonym TEXT,
-    phonetic TEXT,
-    compound TEXT,
-    url TEXT,
-    derivation TEXT,
-    use TEXT
+    translations TEXT,
+    translations_comments TEXT,
+    rest TEXT
 )
 """
 )

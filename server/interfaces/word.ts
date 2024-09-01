@@ -2,24 +2,25 @@ interface IWord {
     id: number,
     word: string,
     language: "en" | "sv",
-    class: string,
-    comment: string,
-    translation: string,
-    explanation: string,
-    example: string,
-    grammar: string,
-    idiom: string,
-    variant: string,
-    paradigm: string,
-    related: string,
-    see: string,
-    definition: string,
-    synonym: string,
-    phonetic: string,
-    compound: string,
-    url: string,
-    derivation: string,
-    use: string
+    class: string | null,
+    comment: string | null,
+    translations: string | null,
+    translations_comments: string | null,
+    rest: string | null
+}
+
+export function isIWord(obj: any): obj is IWord {
+    return typeof obj.word === "string" &&
+        (obj.language === "en" || obj.language === "sv") &&
+        (obj.class === null || typeof obj.class === "string") &&
+        (obj.comment === null || typeof obj.comment === "string") &&
+        (obj.translations === null || typeof obj.translations === "string") &&
+        (obj.translations_comments === null || typeof obj.translations_comments === "string") &&
+        (obj.rest === null || typeof obj.rest === "string")
+}
+
+export function isIWordArray(obj: any[]): obj is IWord[] {
+    return obj.every(word => isIWord(word))
 }
 
 // only word and language for search endpoint
@@ -28,7 +29,6 @@ export type IWordLang = Pick<IWord, "word" | "language">
 export function isIWordLang(obj: any): obj is IWordLang {
     return typeof obj.word === "string" &&
         (obj.language === "en" || obj.language === "sv")
-        ? true : false
 }
 
 export function isIWordLangArray(obj: any[]): obj is IWordLang[] {
