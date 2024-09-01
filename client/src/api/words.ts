@@ -11,7 +11,7 @@ export function searchWords({ query }: { query: string }) {
                     if (response.ok) {
                         return data
                     }
-                    throw new Error
+                    throw new Error(data.error)
                 })
         },
         enabled: query.length > 2

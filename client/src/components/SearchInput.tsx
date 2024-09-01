@@ -7,12 +7,12 @@ function SearchInput() {
     const [query, setQuery] = useState<string>("")
     const combobox = useCombobox()
 
-    const words = searchWords({ query: query })
+    const wordsQuery = searchWords({ query: query })
 
     // select first option when data changes
     useEffect(() => {
         combobox.selectFirstOption()
-    }, [words.data])
+    }, [wordsQuery.data])
 
     return (
         <Combobox
@@ -28,14 +28,18 @@ function SearchInput() {
                         <TextInput
                             placeholder="Search dictionary"
                             value={query}
+                            error={wordsQuery.isError && wordsQuery.error.message}
+
                             autoFocus={true}
+
                             onChange={(event) => {
                                 setQuery(event.currentTarget.value)
                                 combobox.resetSelectedOption()
                             }}
                             onFocus={() => combobox.openDropdown()}
                             onBlur={() => combobox.closeDropdown()}
-                            rightSection={words.isFetching && <Loader size={18} />}
+
+                            rightSection={wordsQuery.isFetching && <Loader size={18} />}
                         />
                     </Combobox.Target>
                 </Grid.Col>
@@ -52,12 +56,12 @@ function SearchInput() {
             </Grid>
 
             {/* Search results */}
-            {words.isSuccess &&
+            {wordsQuery.isSuccess &&
                 <Combobox.Dropdown>
                     <Combobox.Options>
-                        {words.data.length === 0 && <Combobox.Empty>No results found</Combobox.Empty>}
+                        {wordsQuery.data.length === 0 && <Combobox.Empty>No results found</Combobox.Empty>}
                         {
-                            words.data.map((item: any, i: number) => (
+                            wordsQuery.data.map((item: any, i: number) => (
                                 <Combobox.Option value={item.word} key={i}>
                                     {item.language === "en" ? "🇬🇧" : "🇸🇪"} {item.word}
                                 </Combobox.Option>
