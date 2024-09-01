@@ -1,5 +1,6 @@
 # Server
 /server/node_modules
+/server/build
 /server/tools/folkets_en_sv_public.xml
 /server/tools/folkets_sv_en_public.xml
 /server/words.db**
