@@ -25,4 +25,14 @@ interface IWord {
 // only word and language for search endpoint
 export type IWordLang = Pick<IWord, "word" | "language">
 
+export function isIWordLang(obj: any): obj is IWordLang {
+    return typeof obj.word === "string" &&
+        (obj.language === "en" || obj.language === "sv")
+        ? true : false
+}
+
+export function isIWordLangArray(obj: any[]): obj is IWordLang[] {
+    return obj.every(word => isIWordLang(word))
+}
+
 export default IWord
