@@ -29,14 +29,17 @@ for word in root:
 
     translations = []
     compounds = []
-    rest = {}
+    inflections = []
+    rest = defaultdict(list)
 
     for child in word:
-        # storing translations and compounds in their own column for better search
+        # storing translations compounds and inflections in their own column for search
         if child.tag == "translation":
             translations.append(child.get("value"))
         if child.tag == "compound":
             compounds.append(child.get("value"))
+        if child.tag == "inflections":
+            inflections.append(child.get("value"))
         # and also with everything else together
         # not pretty but it helps in the client
         newChild = {}
@@ -49,13 +52,15 @@ for word in root:
             if childChild.get("comment") != None:
                 newChild[childChild.tag + "_comment"] = childChild.get("comment")
 
-        rest[child.tag] = newChild
+        rest[child.tag].append(newChild)
 
     # arrays and dictionaries to json
     if len(translations) > 0:
         newWord["translations"] = json.dumps(translations)
     if len(compounds) > 0:
         newWord["compounds"] = json.dumps(compounds)
+    if len(inflections) > 0:
+        newWord["inflections"] = json.dumps(inflections)
     if rest:
         newWord["rest"] = json.dumps(rest)
     words.append(newWord)

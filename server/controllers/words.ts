@@ -21,7 +21,7 @@ function searchWords(req: Request, res: Response) {
     }
 
     // search query
-    // TODO include verb inflections and translations
+    // TODO include verb inflections, translations and compounds
     let sqlQuery = `
             SELECT DISTINCT word, language
             FROM Words 

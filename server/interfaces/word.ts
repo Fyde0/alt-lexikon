@@ -1,11 +1,12 @@
 interface IWord {
-    id: number,
+    id?: number,
     word: string,
     language: "en" | "sv",
     class: string | null,
     comment: string | null,
     translations: string | null,
     compounds: string | null,
+    inflections: string | null,
     rest: string | null
 }
 
@@ -16,6 +17,7 @@ export function isIWord(obj: any): obj is IWord {
         (obj.comment === null || typeof obj.comment === "string") &&
         (obj.translations === null || typeof obj.translations === "string") &&
         (obj.compounds === null || typeof obj.compounds === "string") &&
+        (obj.inflections === null || typeof obj.inflections === "string") &&
         (obj.rest === null || typeof obj.rest === "string")
 }
 
