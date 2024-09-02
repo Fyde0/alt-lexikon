@@ -1,7 +1,11 @@
-import { AppShell, Flex, Group, Title } from "@mantine/core"
+import { useState } from "react"
+import { AppShell, Flex, Group, Stack, Title } from "@mantine/core"
+// 
 import SearchInput from "../components/SearchInput"
+import Results from "../components/Results"
 
 function Root() {
+    const [wordToGet, setWordToGet] = useState<string>("")
 
     const maxWidth = "500px"
 
@@ -12,6 +16,7 @@ function Root() {
         >
 
             <AppShell.Header>
+
                 <Group h="100%" maw={maxWidth} px="md" mx="auto">
                     <Title order={1} size="h3" fw={400}>
                         <Flex align="center" gap="sm">
@@ -19,10 +24,16 @@ function Root() {
                         </Flex>
                     </Title>
                 </Group>
+
             </AppShell.Header>
 
             <AppShell.Main>
-                <SearchInput />
+
+                <Stack>
+                    <SearchInput setWordToGet={setWordToGet} />
+                    <Results wordToGet={wordToGet} />
+                </Stack>
+
             </AppShell.Main>
 
         </AppShell>

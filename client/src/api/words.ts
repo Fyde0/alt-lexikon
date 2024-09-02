@@ -1,10 +1,10 @@
 import { queryOptions, useQuery } from "@tanstack/react-query"
-import { isIWordLangArray, IWordLang } from "../interfaces/word"
+import IWord, { isIWordArray } from "../interfaces/word"
 
 export function searchWords({ query }: { query: string }) {
     return useQuery(queryOptions({
-        queryKey: ["words", query],
-        queryFn: async (): Promise<IWordLang[]> => {
+        queryKey: ["searchWords", query],
+        queryFn: async (): Promise<IWord[]> => {
 
             const url = new URL(import.meta.env.VITE_API_URL + "/words/")
             url.searchParams.append("query", query)
@@ -12,12 +12,32 @@ export function searchWords({ query }: { query: string }) {
             return fetch(url.toString())
                 .then(async (response) => {
                     const data = await response.json()
-                    if (response.ok && isIWordLangArray(data)) {
+                    if (response.ok && isIWordArray(data)) {
                         return data
                     }
                     throw new Error(data.error)
                 })
         },
         enabled: query.length > 2
+    }))
+}
+
+export function getWord({ word }: { word: string }) {
+    return useQuery(queryOptions({
+        queryKey: ["getWord", word],
+        queryFn: async (): Promise<IWord[]> => {
+
+            const url = new URL(import.meta.env.VITE_API_URL + "/words/" + word)
+
+            return fetch(url.toString())
+                .then(async (response) => {
+                    const data = await response.json()
+                    if (response.ok && isIWordArray(data)) {
+                        return data
+                    }
+                    throw new Error(data.error)
+                })
+        },
+        enabled: word.length > 0
     }))
 }

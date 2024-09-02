@@ -2,9 +2,8 @@ import { useEffect, useState } from "react";
 import { Button, Combobox, Grid, Loader, TextInput, useCombobox } from "@mantine/core";
 // 
 import { searchWords } from "../api/words";
-import { IWordLang } from "../interfaces/word";
 
-function SearchInput() {
+function SearchInput({ setWordToGet }: { setWordToGet: Function }) {
     const [query, setQuery] = useState<string>("")
     const combobox = useCombobox()
 
@@ -15,9 +14,14 @@ function SearchInput() {
         combobox.selectFirstOption()
     }, [wordsQuery.data])
 
+    function handleSubmit(word: string) {
+        combobox.closeDropdown()
+        setWordToGet(word)
+    }
+
     return (
         <Combobox
-            // onOptionSubmit={handleSubmit}
+            onOptionSubmit={(option) => handleSubmit(option)}
             withinPortal={false}
             store={combobox}
         >
@@ -48,7 +52,7 @@ function SearchInput() {
                 {/* Search button */}
                 <Grid.Col span="content">
                     <Button
-                    // onClick={handleSubmit}
+                        onClick={() => handleSubmit(query)}
                     >
                         Search
                     </Button>
