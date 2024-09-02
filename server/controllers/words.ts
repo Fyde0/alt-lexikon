@@ -2,9 +2,10 @@ import { Request, Response } from "express"
 import { z } from "zod"
 // 
 import { file_db } from ".."
-import { isIWordArray, isIWordLangArray } from "../interfaces/word"
 import { serverError } from "../helpers/serverError"
 import { logDebug } from "../helpers/log"
+import { isIWordDBArray, isIWordDBLangArray } from "../interfaces/wordDB"
+import IWord from "../interfaces/word"
 
 function searchWords(req: Request, res: Response) {
     const { query } = req.query
@@ -33,7 +34,7 @@ function searchWords(req: Request, res: Response) {
         .prepare(sqlQuery)
         .all(parameters)
 
-    if (!isIWordLangArray(results)) {
+    if (!isIWordDBLangArray(results)) {
         return serverError(res, "Invalid object from DB in searchWords function.")
     }
 
@@ -59,7 +60,7 @@ function specificWord(req: Request, res: Response) {
     logDebug("Getting word: " + word)
 
     // search query
-    // TODO include verb inflections and translations
+    // TODO include verb inflections, translations and compounds
     let sqlQuery = `
             SELECT *
             FROM Words 
@@ -71,22 +72,32 @@ function specificWord(req: Request, res: Response) {
         .prepare(sqlQuery)
         .all(parameters)
 
-    if (!isIWordArray(results)) {
+    if (!isIWordDBArray(results)) {
         return serverError(res, "Invalid object from DB in specificWord function.")
     }
+
+    const normalResults: IWord[] = results.map(word => {
+        return {
+            word: word.word,
+            language: word.language,
+            class: word.class !== null ? word.class : undefined,
+            comment: word.comment !== null ? word.comment : undefined,
+            data: word.rest !== null ? JSON.parse(word.rest) : undefined
+        }
+    })
 
     // TODO sort
     // prioritize verb infinite form?
 
-    if (results.length === 0) {
+    if (normalResults.length === 0) {
         // 404 Not Found
         logDebug("No results for word: " + word)
-        return res.status(404).json(results)
+        return res.status(404).json(normalResults)
     }
 
     // 200 OK
     logDebug("Returning results for word: " + word)
-    return res.status(200).json(results)
+    return res.status(200).json(normalResults)
 }
 
 export default {

@@ -7,11 +7,11 @@ export function logInfo(message: string) {
 }
 
 export function logDebug(message: string) {
-    debuglog("[DEBUG] " + "[" + now() + "]" + " " + message)
+    debuglog("[" + now() + "]" + " [DEBUG] " + message)
 }
 
 export function logError(message: string) {
-    console.error("[ERROR] " + "[" + now() + "]" + " " + message)
+    console.error("[" + now() + "]" + " [ERROR] " + message)
 }
 
 function now() {

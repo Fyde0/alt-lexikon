@@ -22,6 +22,7 @@ CREATE TABLE IF NOT EXISTS Words (
     comment TEXT,
     translations TEXT,
     compounds TEXT,
+    inflections TEXT,
     rest TEXT
 )
 """
