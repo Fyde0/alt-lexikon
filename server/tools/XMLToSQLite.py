@@ -26,35 +26,36 @@ for word in root:
     newWord["language"] = word.get("lang")
     newWord["class"] = word.get("class")
     newWord["comment"] = word.get("comment")
-    
+
     translations = []
-    translations_comments = []
+    compounds = []
     rest = {}
 
     for child in word:
+        # storing translations and compounds in their own column for better search
         if child.tag == "translation":
             translations.append(child.get("value"))
-            if "comment" in child.attrib:
-                translations_comments.append(child.get("comment"))
-        else:
-            # store everything else together (don't need it for querying db)
-            newChild = {}
-            for attrib in child.items():
-                newChild[attrib[0]] = attrib[1]
+        if child.tag == "compound":
+            compounds.append(child.get("value"))
+        # and also with everything else together
+        # not pretty but it helps in the client
+        newChild = {}
+        for attrib in child.items():
+            newChild[attrib[0]] = attrib[1]
 
-            # only for example/translation and paradigm/inflection
-            for childChild in child:
-                newChild[childChild.tag] = childChild.get("value")
-                if childChild.get("comment") != None:
-                    newChild[childChild.tag + "_comment"] = childChild.get("comment")
+        # only for example/translation and paradigm/inflection
+        for childChild in child:
+            newChild[childChild.tag] = childChild.get("value")
+            if childChild.get("comment") != None:
+                newChild[childChild.tag + "_comment"] = childChild.get("comment")
 
-            rest[child.tag] = newChild
+        rest[child.tag] = newChild
 
     # arrays and dictionaries to json
     if len(translations) > 0:
         newWord["translations"] = json.dumps(translations)
-    if len(translations_comments) > 0:
-        newWord["translations_comments"] = json.dumps(translations_comments)
+    if len(compounds) > 0:
+        newWord["compounds"] = json.dumps(compounds)
     if rest:
         newWord["rest"] = json.dumps(rest)
     words.append(newWord)

@@ -21,7 +21,7 @@ CREATE TABLE IF NOT EXISTS Words (
     class TEXT,
     comment TEXT,
     translations TEXT,
-    translations_comments TEXT,
+    compounds TEXT,
     rest TEXT
 )
 """

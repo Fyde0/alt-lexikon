@@ -5,7 +5,7 @@ interface IWord {
     class: string | null,
     comment: string | null,
     translations: string | null,
-    translations_comments: string | null,
+    compounds: string | null,
     rest: string | null
 }
 
@@ -15,7 +15,7 @@ export function isIWord(obj: any): obj is IWord {
         (obj.class === null || typeof obj.class === "string") &&
         (obj.comment === null || typeof obj.comment === "string") &&
         (obj.translations === null || typeof obj.translations === "string") &&
-        (obj.translations_comments === null || typeof obj.translations_comments === "string") &&
+        (obj.compounds === null || typeof obj.compounds === "string") &&
         (obj.rest === null || typeof obj.rest === "string")
 }
 
