@@ -1,11 +1,11 @@
-import { useState } from "react"
 import { AppShell, Flex, Group, Stack, Title } from "@mantine/core"
 // 
 import SearchInput from "../components/SearchInput"
-import Results from "../components/Results"
+import Results from "./Results"
+import { useParams } from "react-router-dom"
 
 function Root() {
-    const [wordToGet, setWordToGet] = useState<string>("")
+    const { word } = useParams()
 
     const maxWidth = "500px"
 
@@ -30,8 +30,12 @@ function Root() {
             <AppShell.Main>
 
                 <Stack>
-                    <SearchInput setWordToGet={setWordToGet} />
-                    <Results wordToGet={wordToGet} />
+                    {/* 
+                    the key makes the input rerender when the word changes
+                    it's needed so the text in the input updates and is selected
+                     */}
+                    <SearchInput key={word} word={word} />
+                    <Results word={word} />
                 </Stack>
 
             </AppShell.Main>

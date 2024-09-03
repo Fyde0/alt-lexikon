@@ -5,9 +5,11 @@ import "@mantine/core/styles.css"
 // 
 import "./assets/css/index.css"
 import Root from "./pages/Root"
+import { createBrowserRouter, RouterProvider } from "react-router-dom"
 
 function App() {
 
+    // React Query
     const queryClient = new QueryClient({
         defaultOptions: {
             queries: {
@@ -18,17 +20,23 @@ function App() {
         }
     })
 
+    // Mantine
     const theme = createTheme({
         fontFamily: 'Montserrat, sans-serif'
     })
 
+    // React Router
+    const router = createBrowserRouter([
+        {
+            path: "/:word?",
+            element: <Root />
+        }
+    ])
+
     return (
-        <MantineProvider
-            defaultColorScheme="dark"
-            theme={theme}
-        >
+        <MantineProvider defaultColorScheme="dark" theme={theme}>
             <QueryClientProvider client={queryClient}>
-                <Root />
+                <RouterProvider router={router} />
             </QueryClientProvider>
         </MantineProvider>
     )

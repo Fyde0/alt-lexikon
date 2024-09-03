@@ -1,81 +1,96 @@
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { Button, Combobox, Grid, Loader, TextInput, useCombobox } from "@mantine/core";
+import { useForm } from '@mantine/form';
 // 
-import { searchWords } from "../api/words";
+import { searchWords } from "../api/words"
+import { useNavigate } from "react-router-dom";
 
-function SearchInput({ setWordToGet }: { setWordToGet: Function }) {
-    const [query, setQuery] = useState<string>("")
+function SearchInput({ word }: { word: string | undefined }) {
+    const navigate = useNavigate()
+
     const combobox = useCombobox()
+    const form = useForm({
+        initialValues: {
+            query: word || "",
+        },
+        onValuesChange: () => {
+            combobox.openDropdown()
+            combobox.resetSelectedOption()
+        }
+    })
 
-    const wordsQuery = searchWords({ query: query })
+    // search options query
+    const searchQuery = searchWords({ query: form.values.query })
 
     // select first option when data changes
     useEffect(() => {
         combobox.selectFirstOption()
-    }, [wordsQuery.data])
-
-    function handleSubmit(word: string) {
-        combobox.closeDropdown()
-        setWordToGet(word)
-    }
+    }, [searchQuery.data])
 
     return (
-        <Combobox
-            onOptionSubmit={(option) => handleSubmit(option)}
-            withinPortal={false}
-            store={combobox}
-        >
-            <Grid>
+        // onSubmit for Enter key
+        <form onSubmit={form.onSubmit(() => navigate("/" + form.values.query))}>
+            <Combobox
+                // onSubmit for when selecting an option in the list
+                onOptionSubmit={(option) => navigate("/" + option)}
+                withinPortal={false}
+                store={combobox}
+            >
+                <Grid>
 
-                {/* Text input */}
-                <Grid.Col span="auto">
-                    <Combobox.Target >
-                        <TextInput
-                            placeholder="Search dictionary"
-                            value={query}
-                            error={wordsQuery.isError && wordsQuery.error.message}
+                    {/* Text input */}
+                    <Grid.Col span="auto">
+                        <Combobox.Target >
+                            <TextInput
+                                key={form.key("query")}
+                                {...form.getInputProps("query")}
 
-                            autoFocus={true}
+                                placeholder="Search dictionary"
+                                error={searchQuery.isError && searchQuery.error.message}
+                                autoFocus={true}
 
-                            onChange={(event) => {
-                                setQuery(event.currentTarget.value)
-                                combobox.resetSelectedOption()
-                            }}
-                            onFocus={() => combobox.openDropdown()}
-                            onBlur={() => combobox.closeDropdown()}
+                                onFocus={(event) => {
+                                    // selects the content when focused
+                                    // (useful when autofocus)
+                                    event.currentTarget.select()
+                                    // opens the dropdown when focused
+                                    // but not on autofocus
+                                    if (form.isTouched("query")) {
+                                        combobox.openDropdown()
+                                    }
+                                }}
+                                onClick={() => combobox.openDropdown()}
+                                onBlur={() => combobox.closeDropdown()}
 
-                            rightSection={wordsQuery.isFetching && <Loader size={18} />}
-                        />
-                    </Combobox.Target>
-                </Grid.Col>
+                                rightSection={searchQuery.isFetching && <Loader size={18} />}
+                            />
+                        </Combobox.Target>
+                    </Grid.Col>
 
-                {/* Search button */}
-                <Grid.Col span="content">
-                    <Button
-                        onClick={() => handleSubmit(query)}
-                    >
-                        Search
-                    </Button>
-                </Grid.Col>
+                    {/* Search button */}
+                    <Grid.Col span="content">
+                        <Button type="submit">Search</Button>
+                    </Grid.Col>
 
-            </Grid>
+                </Grid>
 
-            {/* Search results */}
-            {wordsQuery.isSuccess &&
-                <Combobox.Dropdown>
-                    <Combobox.Options>
-                        {wordsQuery.data.length === 0 && <Combobox.Empty>No results found</Combobox.Empty>}
-                        {
-                            wordsQuery.data.map((item, i) => (
-                                <Combobox.Option value={item.word} key={i}>
-                                    {item.language === "en" ? "🇬🇧" : "🇸🇪"} {item.word}
-                                </Combobox.Option>
-                            ))
-                        }
-                    </Combobox.Options>
-                </Combobox.Dropdown>
-            }
-        </Combobox>
+                {/* Search results */}
+                {searchQuery.isSuccess &&
+                    <Combobox.Dropdown>
+                        <Combobox.Options>
+                            {searchQuery.data.length === 0 && <Combobox.Empty>No results found</Combobox.Empty>}
+                            {
+                                searchQuery.data.map((item, i) => (
+                                    <Combobox.Option value={item.word} key={i}>
+                                        {item.language === "en" ? "🇬🇧" : "🇸🇪"} {item.word}
+                                    </Combobox.Option>
+                                ))
+                            }
+                        </Combobox.Options>
+                    </Combobox.Dropdown>
+                }
+            </Combobox>
+        </form>
     )
 }
 

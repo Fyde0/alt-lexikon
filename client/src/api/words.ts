@@ -22,7 +22,7 @@ export function searchWords({ query }: { query: string }) {
     }))
 }
 
-export function getWord({ word }: { word: string }) {
+export function getWord({ word }: { word?: string }) {
     return useQuery(queryOptions({
         queryKey: ["getWord", word],
         queryFn: async (): Promise<IWord[]> => {
@@ -38,6 +38,6 @@ export function getWord({ word }: { word: string }) {
                     throw new Error(data.error)
                 })
         },
-        enabled: word.length > 0
+        enabled: !!word && word.length > 0
     }))
 }
