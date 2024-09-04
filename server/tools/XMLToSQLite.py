@@ -13,17 +13,13 @@ parser.add_argument("db", metavar="sqlite.db", help="SQLite database")
 args = parser.parse_args()
 
 # The file has some html entities escaped twice, but not all, this fixes it
-
 # Pattern for double escaped entities (eg. &amp;quot; but not &amp;)
 pattern = re.compile(r'&amp;([a-z0-9]+|#[0-9]{1,6}|#x[0-9a-fA-F]{1,6});')
-
 with open(args.file, "r") as file:
-    
     # Find the pattern and replace &amp; with &
     def replaceMatch(match):
         entity = match.group(1)
         return f'&{entity};'
-    
     fixed = pattern.sub(replaceMatch, file.read())
 
 root = ET.fromstring(fixed)
