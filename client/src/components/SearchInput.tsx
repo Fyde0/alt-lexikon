@@ -36,7 +36,7 @@ function SearchInput({ word }: { word: string | undefined }) {
                 withinPortal={false}
                 store={combobox}
             >
-                <Grid>
+                <Grid maw="500px" mx="auto" px="md">
 
                     {/* Text input */}
                     <Grid.Col span="auto">
@@ -46,6 +46,7 @@ function SearchInput({ word }: { word: string | undefined }) {
                                 {...form.getInputProps("query")}
 
                                 placeholder="Search dictionary"
+
                                 error={searchQuery.isError && searchQuery.error.message}
                                 autoFocus={true}
 

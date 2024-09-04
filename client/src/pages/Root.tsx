@@ -7,12 +7,13 @@ import { useParams } from "react-router-dom"
 function Root() {
     const { word } = useParams()
 
-    const maxWidth = "500px"
+    const maxWidth = "750px"
 
     return (
         <AppShell
             header={{ height: { base: 60, md: 70, lg: 80 } }}
             maw={maxWidth} p="md" mx="auto"
+            px={0}
         >
 
             <AppShell.Header>
