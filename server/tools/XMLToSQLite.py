@@ -5,14 +5,28 @@ import xml.etree.ElementTree as ET
 import sqlite3
 from collections import defaultdict
 import json
+import re
 
 parser = argparse.ArgumentParser(description="Convert XML to SQLite")
-parser.add_argument("file", metavar="file.xml", type=open, help="XML file")
+parser.add_argument("file", metavar="file.xml", help="XML file")
 parser.add_argument("db", metavar="sqlite.db", help="SQLite database")
 args = parser.parse_args()
 
-tree = ET.parse(args.file)
-root = tree.getroot()
+# The file has some html entities escaped twice, but not all, this fixes it
+
+# Pattern for double escaped entities (eg. &amp;quot; but not &amp;)
+pattern = re.compile(r'&amp;([a-z0-9]+|#[0-9]{1,6}|#x[0-9a-fA-F]{1,6});')
+
+with open(args.file, "r") as file:
+    
+    # Find the pattern and replace &amp; with &
+    def replaceMatch(match):
+        entity = match.group(1)
+        return f'&{entity};'
+    
+    fixed = pattern.sub(replaceMatch, file.read())
+
+root = ET.fromstring(fixed)
 
 conn = sqlite3.connect(args.db)
 cursor = conn.cursor()
@@ -42,15 +56,16 @@ for word in root:
             inflections.append(child.get("value"))
         # and also with everything else together
         # not pretty but it helps in the client
-        newChild = {}
+        newChild = defaultdict(list)
         for attrib in child.items():
             newChild[attrib[0]] = attrib[1]
 
-        # only for example/translation and paradigm/inflection
+        # for example/translation, paradigm/inflection, idiom/translation
         for childChild in child:
-            newChild[childChild.tag] = childChild.get("value")
-            if childChild.get("comment") != None:
-                newChild[childChild.tag + "_comment"] = childChild.get("comment")
+            newChildChild = {}
+            for attrib in childChild.items():
+                newChildChild[attrib[0]] = attrib[1]
+            newChild[childChild.tag].append(newChildChild)
 
         rest[child.tag].append(newChild)
 
