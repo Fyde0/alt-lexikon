@@ -26,16 +26,4 @@ export function isIWordDBArray(obj: any[]): obj is IWordDB[] {
     return obj.every(word => isIWordDB(word))
 }
 
-// only word and language for search endpoint
-export type IWordDBLang = Pick<IWordDB, "word" | "language">
-
-export function isIWordDBLang(obj: any): obj is IWordDBLang {
-    return typeof obj.word === "string" &&
-        (obj.language === "en" || obj.language === "sv")
-}
-
-export function isIWordDBLangArray(obj: any[]): obj is IWordDBLang[] {
-    return obj.every(word => isIWordDBLang(word))
-}
-
 export default IWordDB
