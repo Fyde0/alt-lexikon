@@ -84,6 +84,7 @@ function SearchInput({ word }: { word: string | undefined }) {
                                 searchQuery.data.map((item, i) => (
                                     <Combobox.Option value={item.word} key={i}>
                                         {item.language === "en" ? "🇬🇧" : "🇸🇪"} {item.word}
+                                        {item.key !== "Word" && " (" + item.key + ": " + item.match + ")"}
                                     </Combobox.Option>
                                 ))
                             }
