@@ -48,8 +48,10 @@ for word in root:
             translations.append(child.get("value"))
         if child.tag == "compound":
             compounds.append(child.get("value"))
-        if child.tag == "inflections":
-            inflections.append(child.get("value"))
+        if child.tag == "paradigm":
+            for paradigmChild in child:
+                if paradigmChild.tag == "inflection":
+                    inflections.append(paradigmChild.get("value"))
         # and also with everything else together
         # not pretty but it helps in the client
         newChild = defaultdict(list)
