@@ -1,6 +1,6 @@
 // word as stored in the database
 interface IWordDB {
-    id?: number,
+    id: number,
     word: string,
     language: "en" | "sv",
     class: string | null,
