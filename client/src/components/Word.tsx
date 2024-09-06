@@ -5,8 +5,9 @@ import { Link } from "react-router-dom";
 
 function Word({ word, itemKey }: { word: IWord, itemKey: number }) {
 
+    // TODO normalize translation handling
     // TODO change link color, add links to all words?
-    // TODO check which elements have translations (and comments?)
+    // TODO check which elements have comments
 
     // ignoring the url property since it only has sfw files 🪦
 
@@ -15,7 +16,7 @@ function Word({ word, itemKey }: { word: IWord, itemKey: number }) {
     const classes = word.class?.split(", ").map((item) => fullClasses[item] || item)
     const translations = word.data?.translation
 
-    const grammarComments = word.data?.grammar?.map(grammar => grammar.value).join(", ")
+    const grammar = word.data?.grammar?.map(grammar => grammar.value).join(", ")
     const pronunciations = word.data?.phonetic?.map(pronun => "[" + pronun.value + "]").join(", ")
     // TODO add forvo link
 
@@ -37,7 +38,14 @@ function Word({ word, itemKey }: { word: IWord, itemKey: number }) {
         }).join(", ")
     }).join(", ")
 
-    const definitions = word.data?.definition?.map(def => def.value).join(", ")
+    const definitions = word.data?.definition?.map(def => {
+        let definition = def.value
+        if (def.translation) {
+            const trans = def.translation.map(trans => trans.value).join(", ")
+            definition += " (" + trans + ")"
+        }
+        return definition
+    }).join(", ")
 
     // not really sure what the level is
     // .sort((a, b) => Number(a.level) - Number(b.level))
@@ -81,6 +89,9 @@ function Word({ word, itemKey }: { word: IWord, itemKey: number }) {
 
     const related = word.data?.related?.map(rel => {
         let newRel = rel.value
+        if (rel.translation) {
+            newRel += ", " + rel.translation[0].value
+        }
         let add = []
         rel.type && add.push(rel.type)
         rel.comment && add.push(rel.comment)
@@ -91,17 +102,21 @@ function Word({ word, itemKey }: { word: IWord, itemKey: number }) {
     }).join(", ")
 
     const compounds = word.data?.compound?.map(comp => {
-        // TODO add translation
         let compound = comp.value
         if (comp.inflection) {
-            compound += "(Inflection: " + comp.inflection + ")"
+            compound += " (Inflection: " + comp.inflection + ")"
+        }
+        if (comp.translation) {
+            compound += ", " + otherFlag + " " + comp.translation[0].value
         }
         return compound
     })
 
     const derivations = word.data?.derivation?.map(deriv => {
-        // TODO add translation
         let derivation = deriv.value
+        if (deriv.translation) {
+            derivation += ", " + otherFlag + " " + deriv.translation[0].value
+        }
         if (deriv.inflection) {
             derivation += "(Inflection: " + deriv.inflection + ")"
         }
@@ -133,7 +148,7 @@ function Word({ word, itemKey }: { word: IWord, itemKey: number }) {
                 }
             </Accordion.Control>
             <Accordion.Panel>
-                {grammarComments && <Text>Grammar: {grammarComments}</Text>}
+                {grammar && <Text>Grammar: {grammar}</Text>}
                 {pronunciations && <Text>Pronunciation: {pronunciations}</Text>}
                 {explanation && <Text>Explanation: {explanation}</Text>}
                 {variants && <Text>Variants: {variants}</Text>}

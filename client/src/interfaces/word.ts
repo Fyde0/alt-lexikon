@@ -14,14 +14,14 @@ interface IWordData {
     variant?: Variant[]
     paradigm?: Paradigm[]
     synonym?: Synonym[]
-    definition?: WordDataEntry[]
+    definition?: WordDataEntryWithTranslation[]
     example?: WordDataEntryWithTranslation[]
     idiom?: WordDataEntryWithTranslation[]
     explanation?: WordDataEntryWithTranslation[]
     see?: WordDataEntryWithType[]
-    related?: WordDataEntryWithType[]
-    compound?: WordDataEntryWithInflection[]
-    derivation?: WordDataEntryWithInflection[]
+    related?: Related[]
+    compound?: Compound[]
+    derivation?: Derivation[]
     use?: WordDataEntry[]
 }
 
@@ -54,6 +54,10 @@ type Synonym = {
     value: string,
     level: string
 }
+
+type Compound = WordDataEntryWithInflection & WordDataEntryWithTranslation
+type Related = WordDataEntryWithType & WordDataEntryWithTranslation
+type Derivation = WordDataEntryWithInflection & WordDataEntryWithTranslation
 
 export function isIWord(obj: any): obj is IWord {
     return typeof obj.id === "number" &&
