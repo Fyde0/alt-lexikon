@@ -59,9 +59,11 @@ for word in root:
         if child.tag == "compound":
             newCompound = {}
             newCompound["value"] = child.get("value")
-            newCompound["translation"] = child.get("translation")
             newCompound["inflection"] = child.get("inflection")
             newCompound["comment"] = child.get("comment")
+            for compoundChild in child:
+                if compoundChild.tag == "translation":
+                    newCompound["translation"] = compoundChild.get("value")
             compounds.append(newCompound)
         if child.tag == "paradigm":
             for paradigmChild in child:

@@ -34,14 +34,14 @@ function searchWords(req: Request, res: Response) {
                     WHEN word LIKE :query THEN word
                     WHEN Translations.value LIKE :query THEN Translations.value
                     WHEN Inflections.value LIKE :query THEN Inflections.value
-                    WHEN Compounds.value LIKE :query THEN Compounds.value
+                    WHEN REPLACE(Compounds.value, '|', '') LIKE :query THEN Compounds.value
                     ELSE NULL
                 END AS match,
                 CASE 
                     WHEN word LIKE :query THEN 'Word'
                     WHEN Translations.value LIKE :query THEN 'Translation'
                     WHEN Inflections.value LIKE :query THEN 'Inflection'
-                    WHEN Compounds.value LIKE :query THEN 'Compound'
+                    WHEN REPLACE(Compounds.value, '|', '') LIKE :query THEN 'Compound'
                     ELSE NULL
                 END AS key
             FROM Words
@@ -51,7 +51,7 @@ function searchWords(req: Request, res: Response) {
             WHERE word LIKE :query
             OR Translations.value LIKE :query
             OR Inflections.value LIKE :query
-            OR Compounds.value LIKE :query
+            OR REPLACE(Compounds.value, '|', '') LIKE :query
     `
     const parameters = { "query": query + "%" }
 
@@ -93,7 +93,7 @@ function specificWord(req: Request, res: Response) {
             WHEN Words.word = :word THEN 'Word'
             WHEN Translations.value = :word THEN 'Translation'
             WHEN Inflections.value = :word THEN 'Inflection'
-            WHEN Compounds.value = :word THEN 'Compound'
+            WHEN REPLACE(Compounds.value, '|', '') = :word THEN 'Compound'
             ELSE NULL
         END AS key
         FROM Words
@@ -103,7 +103,7 @@ function specificWord(req: Request, res: Response) {
         WHERE Words.word = :word
         OR Translations.value = :word
         OR Inflections.value = :word
-        OR Compounds.value = :word
+        OR REPLACE(Compounds.value, '|', '') = :word
     `
     const parameters = { "word": word }
 
@@ -124,6 +124,10 @@ function specificWord(req: Request, res: Response) {
         }
         if (a.key === "Inflection") return -1
         if (b.key === "Inflection") return 1
+        // same for compound
+        if (a.key === "Compound" && b.key === "Compound") { return a.id - b.id }
+        if (a.key === "Compound") return -1
+        if (b.key === "Compound") return 1
         // then, exact word match
         // keep DB order if same word
         if (a.word === word && b.word === word) {
