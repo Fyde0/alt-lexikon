@@ -30,34 +30,30 @@ function searchWords(req: Request, res: Response) {
             SELECT DISTINCT
                 word, 
                 language, 
-                COALESCE(
-                    CASE
-                        WHEN word LIKE :query THEN word
-                        ELSE NULL
-                    END,
-                    CASE 
-                        WHEN json_translation.value LIKE :query THEN json_translation.value
-                        ELSE NULL
-                    END,
-                    CASE 
-                        WHEN json_inflection.value LIKE :query THEN json_inflection.value
-                        ELSE NULL
-                    END
-                ) AS match,
+                CASE
+                    WHEN word LIKE :query THEN word
+                    WHEN Translations.value LIKE :query THEN Translations.value
+                    WHEN Inflections.value LIKE :query THEN Inflections.value
+                    WHEN Compounds.value LIKE :query THEN Compounds.value
+                    ELSE NULL
+                END AS match,
                 CASE 
                     WHEN word LIKE :query THEN 'Word'
-                    WHEN json_translation.value LIKE :query THEN 'Translation'
-                    WHEN json_inflection.value LIKE :query THEN 'Inflection'
+                    WHEN Translations.value LIKE :query THEN 'Translation'
+                    WHEN Inflections.value LIKE :query THEN 'Inflection'
+                    WHEN Compounds.value LIKE :query THEN 'Compound'
                     ELSE NULL
                 END AS key
             FROM Words
-            LEFT JOIN json_each(translations) AS json_translation ON true
-            LEFT JOIN json_each(inflections) AS json_inflection ON true
+            LEFT JOIN Translations ON Words.id = Translations.word_id
+            LEFT JOIN Inflections ON Words.id = Inflections.word_id
+            LEFT JOIN Compounds ON Words.id = Compounds.word_id
             WHERE word LIKE :query
-            OR json_translation.value LIKE :query
-            OR json_inflection.value LIKE :query
+            OR Translations.value LIKE :query
+            OR Inflections.value LIKE :query
+            OR Compounds.value LIKE :query
     `
-    let parameters = { "query": query + "%" }
+    const parameters = { "query": query + "%" }
 
     const results = file_db
         .prepare(sqlQuery)
@@ -67,20 +63,19 @@ function searchWords(req: Request, res: Response) {
         return serverError(res, "Invalid object from DB in searchWords function.")
     }
 
-    // simple sorting by length
     results.sort((a, b) => {
         // exact word match first
-        if (a.match === query && a.key === "word") return -1
-        if (b.match === query && b.key === "word") return 1
+        if (a.match === query && a.key === "Word") return -1
+        if (b.match === query && b.key === "Word") return 1
         // then, other exact match
         if (a.match === query) return -1
         if (b.match === query) return 1
-        // shorter first
+        // then, shorter first
         return a.match.length - b.match.length
     })
 
     // only 6 results
-    results.splice(6)
+    results.splice(10)
 
     // 200 OK
     logDebug("Returning results for query: " + query)
@@ -92,16 +87,25 @@ function specificWord(req: Request, res: Response) {
     logDebug("Getting word: " + word)
 
     // search query
-    let sqlQuery = `
-            SELECT *
-            FROM Words 
-            WHERE word = :word
-            OR rest LIKE :wordMiddle
-        `
-    let parameters = {
-        "word": word,
-        "wordMiddle": "%\"" + word + "\"%"
-    }
+    const sqlQuery = `
+        SELECT DISTINCT Words.*,
+        CASE 
+            WHEN Words.word = :word THEN 'Word'
+            WHEN Translations.value = :word THEN 'Translation'
+            WHEN Inflections.value = :word THEN 'Inflection'
+            WHEN Compounds.value = :word THEN 'Compound'
+            ELSE NULL
+        END AS key
+        FROM Words
+        LEFT JOIN Translations ON Words.id = Translations.word_id
+        LEFT JOIN Inflections ON Words.id = Inflections.word_id
+        LEFT JOIN Compounds ON Words.id = Compounds.word_id
+        WHERE Words.word = :word
+        OR Translations.value = :word
+        OR Inflections.value = :word
+        OR Compounds.value = :word
+    `
+    const parameters = { "word": word }
 
     const results = file_db
         .prepare(sqlQuery)
@@ -110,6 +114,25 @@ function specificWord(req: Request, res: Response) {
     if (!isIWordDBArray(results)) {
         return serverError(res, "Invalid object from DB in specificWord function.")
     }
+
+    results.sort((a, b) => {
+        // exact inflection match first
+        if (a.key === "Inflection" && b.key === "Inflection") {
+            // this should keep the DB order when they have the same inflection
+            // e.g. when searching "tog", keeps the same order for all "ta" entries
+            return a.id - b.id
+        }
+        if (a.key === "Inflection") return -1
+        if (b.key === "Inflection") return 1
+        // then, exact word match
+        // keep DB order if same word
+        if (a.word === word && b.word === word) {
+            return a.id - b.id
+        }
+        if (a.word === word) return -1
+        if (b.word === word) return 1
+        return 0
+    })
 
     const normalResults: IWord[] = results.map(word => {
         return {
@@ -120,31 +143,6 @@ function specificWord(req: Request, res: Response) {
             comment: word.comment !== null ? word.comment : undefined,
             data: word.rest !== null ? JSON.parse(word.rest) : undefined
         }
-    })
-
-    normalResults.sort((a, b) => {
-        // exact inflection match first
-        const aInfl = a.data?.paradigm?.some(paradigm => {
-            return paradigm.inflection?.some(infl => {
-                return infl.value === word
-            })
-        }) || false
-        const bInfl = b.data?.paradigm?.some(paradigm => {
-            return paradigm.inflection?.some(infl => {
-                return infl.value === word
-            })
-        }) || false
-        // this should keep the DB order when they have the same inflection
-        // e.g. when searching "tog", keeps the same order for all "ta" entries
-        if (aInfl && bInfl) {
-            return a.id < b.id ? -1 : 1
-        }
-        if (aInfl) return -1
-        if (bInfl) return 1
-        // then, exact word match
-        if (a.word === word) return -1
-        if (b.word === word) return 1
-        return 0
     })
 
     if (normalResults.length === 0) {

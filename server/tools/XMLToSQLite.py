@@ -14,12 +14,13 @@ args = parser.parse_args()
 
 # The file has some html entities escaped twice, but not all, this fixes it
 # Pattern for double escaped entities (eg. &amp;quot; but not &amp;)
-pattern = re.compile(r'&amp;([a-z0-9]+|#[0-9]{1,6}|#x[0-9a-fA-F]{1,6});')
+pattern = re.compile(r"&amp;([a-z0-9]+|#[0-9]{1,6}|#x[0-9a-fA-F]{1,6});")
 with open(args.file, "r") as file:
     # Find the pattern and replace &amp; with &
     def replaceMatch(match):
         entity = match.group(1)
-        return f'&{entity};'
+        return f"&{entity};"
+
     fixed = pattern.sub(replaceMatch, file.read())
 
 root = ET.fromstring(fixed)
@@ -27,7 +28,12 @@ root = ET.fromstring(fixed)
 conn = sqlite3.connect(args.db)
 cursor = conn.cursor()
 
-words = []
+def insertObject(obj, table, crsr):
+    columns = ", ".join(obj.keys())
+    placeholders = ", ".join(f":{key}" for key in obj.keys())
+    query = f"INSERT INTO {table} ({columns}) VALUES ({placeholders})"
+    crsr.execute(query, obj)
+    return crsr.lastrowid
 
 for word in root:
 
@@ -37,21 +43,33 @@ for word in root:
     newWord["class"] = word.get("class")
     newWord["comment"] = word.get("comment")
 
+    rest = defaultdict(list)
+
     translations = []
     compounds = []
     inflections = []
-    rest = defaultdict(list)
 
     for child in word:
-        # storing translations compounds and inflections in their own column for search
+        # translations, compounds ans inflections go in separate tables for better search
         if child.tag == "translation":
-            translations.append(child.get("value"))
+            newTranslation = {}
+            newTranslation["value"] = child.get("value")
+            newTranslation["comment"] = child.get("comment")
+            translations.append(newTranslation)
         if child.tag == "compound":
-            compounds.append(child.get("value"))
+            newCompound = {}
+            newCompound["value"] = child.get("value")
+            newCompound["translation"] = child.get("translation")
+            newCompound["inflection"] = child.get("inflection")
+            newCompound["comment"] = child.get("comment")
+            compounds.append(newCompound)
         if child.tag == "paradigm":
             for paradigmChild in child:
                 if paradigmChild.tag == "inflection":
-                    inflections.append(paradigmChild.get("value"))
+                    newInflection = {}
+                    newInflection["value"] = paradigmChild.get("value")
+                    newInflection["comment"] = paradigmChild.get("comment")
+                    inflections.append(newInflection)
         # and also with everything else together
         # not pretty but it helps in the client
         newChild = defaultdict(list)
@@ -67,25 +85,19 @@ for word in root:
 
         rest[child.tag].append(newChild)
 
-    # arrays and dictionaries to json
-    if len(translations) > 0:
-        newWord["translations"] = json.dumps(translations)
-    if len(compounds) > 0:
-        newWord["compounds"] = json.dumps(compounds)
-    if len(inflections) > 0:
-        newWord["inflections"] = json.dumps(inflections)
     if rest:
         newWord["rest"] = json.dumps(rest)
-    words.append(newWord)
-
-
-for word in words:
-    # build query
-    columns = ", ".join(word.keys())
-    placeholders = ", ".join(f":{key}" for key in word.keys())
-    query = f"INSERT INTO Words ({columns}) VALUES ({placeholders})"
-
-    cursor.execute(query, word)
+    
+    wordId = insertObject(newWord, "Words", cursor)
+    for translation in translations:
+        translation["word_id"] = wordId
+        insertObject(translation, "Translations", cursor)
+    for inflection in inflections:
+        inflection["word_id"] = wordId
+        insertObject(inflection, "Inflections", cursor)
+    for compound in compounds:
+        compound["word_id"] = wordId
+        insertObject(compound, "Compounds", cursor)
 
 conn.commit()
 conn.close()

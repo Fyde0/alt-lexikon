@@ -5,20 +5,16 @@ interface IWordDB {
     language: "en" | "sv",
     class: string | null,
     comment: string | null,
-    translations: string | null,
-    compounds: string | null,
-    inflections: string | null,
-    rest: string | null
+    rest: string | null,
+    key?: string
 }
 
 export function isIWordDB(obj: any): obj is IWordDB {
-    return typeof obj.word === "string" &&
+    return typeof obj.id === "number" &&
+        typeof obj.word === "string" &&
         (obj.language === "en" || obj.language === "sv") &&
         (obj.class === null || typeof obj.class === "string") &&
         (obj.comment === null || typeof obj.comment === "string") &&
-        (obj.translations === null || typeof obj.translations === "string") &&
-        (obj.compounds === null || typeof obj.compounds === "string") &&
-        (obj.inflections === null || typeof obj.inflections === "string") &&
         (obj.rest === null || typeof obj.rest === "string")
 }
 
