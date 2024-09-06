@@ -27,12 +27,17 @@ function SearchInput({ word }: { word: string | undefined }) {
         combobox.selectFirstOption()
     }, [searchQuery.data])
 
+    function handleSubmit(word: string) {
+        combobox.closeDropdown()
+        navigate("/" + word)
+    }
+
     return (
         // onSubmit for Enter key
-        <form onSubmit={form.onSubmit(() => navigate("/" + form.values.query))}>
+        <form onSubmit={form.onSubmit(() => handleSubmit(form.values.query))}>
             <Combobox
                 // onSubmit for when selecting an option in the list
-                onOptionSubmit={(option) => navigate("/" + option)}
+                onOptionSubmit={(option) => handleSubmit(option)}
                 withinPortal={false}
                 store={combobox}
             >

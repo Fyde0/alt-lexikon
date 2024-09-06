@@ -1,4 +1,5 @@
 interface IWord {
+    id: number,
     word: string,
     language: "en" | "sv",
     class?: string,
@@ -17,6 +18,11 @@ interface IWordData {
     example?: WordDataEntryWithTranslation[]
     idiom?: WordDataEntryWithTranslation[]
     explanation?: WordDataEntryWithTranslation[]
+    see?: WordDataEntryWithType[]
+    related?: WordDataEntryWithType[]
+    compound?: WordDataEntryWithInflection[]
+    derivation?: WordDataEntryWithInflection[]
+    use?: WordDataEntry[]
 }
 
 type WordDataEntry = {
@@ -26,6 +32,14 @@ type WordDataEntry = {
 
 type WordDataEntryWithTranslation = WordDataEntry & {
     translation: WordDataEntry[]
+}
+
+type WordDataEntryWithType = WordDataEntry & {
+    type?: string
+}
+
+type WordDataEntryWithInflection = WordDataEntry & {
+    inflection?: string
 }
 
 type Variant = WordDataEntry & {
@@ -42,7 +56,8 @@ type Synonym = {
 }
 
 export function isIWord(obj: any): obj is IWord {
-    return typeof obj.word === "string" &&
+    return typeof obj.id === "number" &&
+        typeof obj.word === "string" &&
         (obj.language === "en" || obj.language === "sv")
 }
 

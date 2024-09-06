@@ -1,8 +1,14 @@
 import { Accordion, List, Text } from "@mantine/core";
 import IWord from "../interfaces/word";
 import { fullClasses } from "../interfaces/class";
+import { Link } from "react-router-dom";
 
 function Word({ word, itemKey }: { word: IWord, itemKey: number }) {
+
+    // TODO change link color, add links to all words?
+    // TODO check which elements have translations (and comments?)
+
+    // ignoring the url property since it only has sfw files 🪦
 
     const flag = word.language === "en" ? "🇬🇧" : "🇸🇪"
     const otherFlag = word.language === "en" ? "🇸🇪" : "🇬🇧"
@@ -11,9 +17,7 @@ function Word({ word, itemKey }: { word: IWord, itemKey: number }) {
 
     const grammarComments = word.data?.grammar?.map(grammar => grammar.value).join(", ")
     const pronunciations = word.data?.phonetic?.map(pronun => "[" + pronun.value + "]").join(", ")
-    // TODO add audio file?
-
-    // see
+    // TODO add forvo link
 
     const variants = word.data?.variant?.map(item => {
         let variant = ""
@@ -36,9 +40,8 @@ function Word({ word, itemKey }: { word: IWord, itemKey: number }) {
     const definitions = word.data?.definition?.map(def => def.value).join(", ")
 
     // not really sure what the level is
-    const synonyms = word.data?.synonym?.sort((a, b) => Number(a.level) - Number(b.level))
-        .map(item => item.value)
-        .join(", ")
+    // .sort((a, b) => Number(a.level) - Number(b.level))
+    const synonyms = word.data?.synonym?.map(item => item.value).join(", ")
 
     const examples = word.data?.example?.map(ex => {
         let example = ex.value
@@ -68,6 +71,45 @@ function Word({ word, itemKey }: { word: IWord, itemKey: number }) {
         return explanation
     }).join(", ")
 
+    const see = word.data?.see?.filter(see => {
+        // animation and phonetic are sfw files 🪦
+        // no idea what saldo is but it's not displayed in the original website
+        if (see.type !== "saldo" && see.type !== "animation" && see.type !== "phonetic") {
+            return true
+        }
+    }).map(see => see.value)
+
+    const related = word.data?.related?.map(rel => {
+        let newRel = rel.value
+        let add = []
+        rel.type && add.push(rel.type)
+        rel.comment && add.push(rel.comment)
+        if (add.length > 0) {
+            newRel += " (" + add.join(", ") + ")"
+        }
+        return newRel
+    }).join(", ")
+
+    const compounds = word.data?.compound?.map(comp => {
+        // TODO add translation
+        let compound = comp.value
+        if (comp.inflection) {
+            compound += "(Inflection: " + comp.inflection + ")"
+        }
+        return compound
+    })
+
+    const derivations = word.data?.derivation?.map(deriv => {
+        // TODO add translation
+        let derivation = deriv.value
+        if (deriv.inflection) {
+            derivation += "(Inflection: " + deriv.inflection + ")"
+        }
+        return derivation
+    })
+
+    const use = word.data?.use?.map(use => use.value).join(", ")
+
     return (
         <Accordion.Item value={String(itemKey)}>
             <Accordion.Control>
@@ -95,11 +137,33 @@ function Word({ word, itemKey }: { word: IWord, itemKey: number }) {
                 {pronunciations && <Text>Pronunciation: {pronunciations}</Text>}
                 {explanation && <Text>Explanation: {explanation}</Text>}
                 {variants && <Text>Variants: {variants}</Text>}
+                {see && see.length > 0 && <Text>See: {" "}
+                    {see.map((see, i) => {
+                        return (
+                            <span key={i}>
+                                {i ? ", " : ""}
+                                <Link key={i} to={"/" + see}>{see}</Link>
+                            </span>
+                        )
+                    })}
+                </Text>}
                 {inflections && <Text>Inflections: {inflections}</Text>}
+                {use && <Text>Use: {use}</Text>}
                 {synonyms && <Text>Synonyms: {synonyms}</Text>}
                 {definitions && <Text>Definitions: {definitions}</Text>}
-                {
-                    examples &&
+                {derivations &&
+                    <>
+                        <Text>Derivations: </Text>
+                        <List withPadding>
+                            {
+                                derivations.map((derivation, i) => {
+                                    return <List.Item key={i}>{derivation}</List.Item>
+                                })
+                            }
+                        </List>
+                    </>
+                }
+                {examples &&
                     <>
                         <Text>Examples: </Text>
                         <List withPadding>
@@ -111,8 +175,7 @@ function Word({ word, itemKey }: { word: IWord, itemKey: number }) {
                         </List>
                     </>
                 }
-                {
-                    idioms &&
+                {idioms &&
                     <>
                         <Text>Idioms: </Text>
                         <List withPadding>
@@ -124,7 +187,20 @@ function Word({ word, itemKey }: { word: IWord, itemKey: number }) {
                         </List>
                     </>
                 }
-                
+                {compounds &&
+                    <>
+                        <Text>Compounds: </Text>
+                        <List withPadding>
+                            {
+                                compounds.map((compound, i) => {
+                                    return <List.Item key={i}>{compound}</List.Item>
+                                })
+                            }
+                        </List>
+                    </>
+                }
+
+                {related && <Text>Related: {related}</Text>}
             </Accordion.Panel>
         </Accordion.Item>
     )
