@@ -1,7 +1,7 @@
-import { Accordion } from "@mantine/core"
+import { Stack } from "@mantine/core"
 // 
-import Word from "../components/Word"
-import { getWord } from "../api/words"
+import Word from "./Word"
+import { getWord } from "../../api/words"
 
 function Results({ word }: { word: string | undefined }) {
 
@@ -9,14 +9,13 @@ function Results({ word }: { word: string | undefined }) {
 
     if (getWordQuery.isSuccess) {
         return (
-            <Accordion multiple={true}>
+            <Stack gap={0}>
                 {
                     getWordQuery.data.map((word, i) => {
-                        // mantine's accordion needs the itemKey
-                        return <Word key={i} word={word} itemKey={i} />
+                        return <Word key={i} word={word} />
                     })
                 }
-            </Accordion>
+            </Stack>
         )
     }
 }

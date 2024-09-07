@@ -1,7 +1,7 @@
 import { AppShell, Flex, Group, Stack, Title } from "@mantine/core"
 // 
 import SearchInput from "../components/SearchInput"
-import Results from "./Results"
+import Results from "../components/Results"
 import { useParams } from "react-router-dom"
 
 function Root() {
@@ -11,7 +11,7 @@ function Root() {
 
     return (
         <AppShell
-            header={{ height: { base: 60, md: 70, lg: 80 } }}
+            header={{ height: { base: 60, sm: 70 } }}
             maw={maxWidth} p="md" mx="auto"
             px={0}
         >
