@@ -19,45 +19,45 @@ interface IWordData {
     idiom?: WordDataEntryWithTranslation[]
     explanation?: WordDataEntryWithTranslation[]
     see?: WordDataEntryWithType[]
-    related?: Related[]
-    compound?: Compound[]
-    derivation?: Derivation[]
+    related?: WordDataEntryWithTypeAndTranslation[]
+    compound?: WordDataEntryWithInflectionAndTranslation[]
+    derivation?: WordDataEntryWithInflectionAndTranslation[]
     use?: WordDataEntry[]
 }
 
-type WordDataEntry = {
+// All of this can be done with optional properties but strong typing helps my brain
+
+export type WordDataEntry = {
     value: string,
-    comment?: string
+    comment?: string,
 }
 
-type WordDataEntryWithTranslation = WordDataEntry & {
-    translation: WordDataEntry[]
+export type WordDataEntryWithTranslation = WordDataEntry & {
+    translation?: WordDataEntry[]
 }
 
 type WordDataEntryWithType = WordDataEntry & {
     type?: string
 }
 
-type WordDataEntryWithInflection = WordDataEntry & {
+export type WordDataEntryWithInflection = WordDataEntry & {
     inflection?: string
 }
+
+type WordDataEntryWithTypeAndTranslation = WordDataEntryWithType & WordDataEntryWithTranslation
+type WordDataEntryWithInflectionAndTranslation = WordDataEntryWithInflection & WordDataEntryWithTranslation
 
 type Variant = WordDataEntry & {
     alt?: string
 }
 
 type Paradigm = {
-    inflection: WordDataEntry[]
+    inflection?: WordDataEntry[]
 }
 
-type Synonym = {
-    value: string,
-    level: string
+type Synonym = WordDataEntry & {
+    level?: string
 }
-
-type Compound = WordDataEntryWithInflection & WordDataEntryWithTranslation
-type Related = WordDataEntryWithType & WordDataEntryWithTranslation
-type Derivation = WordDataEntryWithInflection & WordDataEntryWithTranslation
 
 export function isIWord(obj: any): obj is IWord {
     return typeof obj.id === "number" &&
@@ -67,6 +67,14 @@ export function isIWord(obj: any): obj is IWord {
 
 export function isIWordArray(obj: any[]): obj is IWord[] {
     return obj.every(word => isIWord(word))
+}
+
+export function isWithTranslation(entry: WordDataEntry | WordDataEntryWithTranslation): entry is WordDataEntryWithTranslation {
+    return (entry as WordDataEntryWithTranslation).translation !== undefined
+}
+
+export function isWithInflection(entry: WordDataEntry | WordDataEntryWithInflection): entry is WordDataEntryWithInflection {
+    return (entry as WordDataEntryWithInflection).inflection !== undefined
 }
 
 export default IWord

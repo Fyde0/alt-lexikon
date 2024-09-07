@@ -1,6 +1,6 @@
 import { Stack } from "@mantine/core"
 // 
-import Word from "./Word"
+import Word from "../Word"
 import { getWord } from "../../api/words"
 
 function Results({ word }: { word: string | undefined }) {
