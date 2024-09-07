@@ -34,7 +34,10 @@ function SearchInput({ word }: { word: string | undefined }) {
 
     return (
         // onSubmit for Enter key
-        <form onSubmit={form.onSubmit(() => handleSubmit(form.values.query))}>
+        <form
+            onSubmit={form.onSubmit(() => handleSubmit(form.values.query))}
+            style={{ width: "100%" }}
+        >
             <Combobox
                 // onSubmit for when selecting an option in the list
                 onOptionSubmit={(option) => handleSubmit(option)}
