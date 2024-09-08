@@ -1,11 +1,13 @@
 import { useEffect } from "react";
-import { Button, Combobox, Grid, Loader, TextInput, useCombobox } from "@mantine/core";
+import { Button, Combobox, Grid, Group, Kbd, Loader, TextInput, useCombobox } from "@mantine/core";
 import { useForm } from '@mantine/form';
 // 
 import { searchWords } from "../api/words"
 import { useNavigate } from "react-router-dom";
+import useSettingsStore from "../stores/settings";
 
 function SearchInput({ word }: { word: string | undefined }) {
+    const { settings } = useSettingsStore()
     const navigate = useNavigate()
 
     const combobox = useCombobox()
@@ -27,6 +29,12 @@ function SearchInput({ word }: { word: string | undefined }) {
         combobox.selectFirstOption()
     }, [searchQuery.data])
 
+    // appends characters to input field, used for å, ä, ö
+    function appendToInput(char: string) {
+        form.setFieldValue("query", form.values.query + char)
+        form.getInputNode("query")?.focus()
+    }
+
     function handleSubmit(word: string) {
         combobox.closeDropdown()
         navigate("/" + word)
@@ -44,7 +52,7 @@ function SearchInput({ word }: { word: string | undefined }) {
                 withinPortal={false}
                 store={combobox}
             >
-                <Grid maw="500px" mx="auto" px="md">
+                <Grid maw="500px" mx="auto" px="md" align="center">
 
                     {/* Text input */}
                     <Grid.Col span="auto">
@@ -75,6 +83,31 @@ function SearchInput({ word }: { word: string | undefined }) {
                             />
                         </Combobox.Target>
                     </Grid.Col>
+                    
+                    {settings.showCharacters &&
+                        <Grid.Col span="content">
+                            <Group gap={2} align="center">
+                                <Button
+                                    variant="transparent" p={0} m={0}
+                                    onClick={() => appendToInput("å")}
+                                >
+                                    <Kbd size="md">å</Kbd>
+                                </Button>
+                                <Button
+                                    variant="transparent" p={0} m={0}
+                                    onClick={() => appendToInput("ö")}
+                                >
+                                    <Kbd size="md">ö</Kbd>
+                                </Button>
+                                <Button
+                                    variant="transparent" p={0} m={0}
+                                    onClick={() => appendToInput("ä")}
+                                >
+                                    <Kbd size="md">ä</Kbd>
+                                </Button>
+                            </Group>
+                        </Grid.Col>
+                    }
 
                     {/* Search button */}
                     <Grid.Col span="content">

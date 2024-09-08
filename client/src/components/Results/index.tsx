@@ -9,7 +9,7 @@ function Results({ word }: { word: string | undefined }) {
 
     if (getWordQuery.isSuccess) {
         return (
-            <Stack gap={0}>
+            <Stack gap={0} pb="md">
                 {
                     getWordQuery.data.map((word, i) => {
                         return <Word key={i} word={word} />

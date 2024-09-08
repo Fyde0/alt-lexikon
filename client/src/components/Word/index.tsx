@@ -6,10 +6,12 @@ import { fullClasses } from "../../interfaces/class";
 import { handleEntry, handleParenthesis, handleTranslations } from "./helpers/word";
 import Links from "./Links";
 import EntryList from "./EntryList";
+import useSettingsStore from "../../stores/settings";
 
 function Word({ word }: { word: IWord }) {
+    const { settings } = useSettingsStore()
     // handles expand/collapse
-    const [opened, { toggle }] = useDisclosure(false)
+    const [opened, { toggle }] = useDisclosure(settings.expandResults)
 
     // TODO normalize translation handling
     // TODO change link color, add links to all words?
@@ -129,7 +131,7 @@ function Word({ word }: { word: IWord }) {
                         {pronunciations && <Text>Pronunciation: {pronunciations}</Text>}
                         {explanation && <Text>Explanation: {explanation}</Text>}
                         {variants && <Text>Variants: {variants}</Text>}
-                        {see && <Text>See: {" "} <Links links={see} /></Text>}
+                        {see && see.length > 0 && <Text>See: {" "} <Links links={see} /></Text>}
                         {inflections && <Text>Inflections: {inflections}</Text>}
                         {use && <Text>Use: {use}</Text>}
                         {synonyms && <Text>Synonyms: {synonyms}</Text>}
