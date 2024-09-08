@@ -1,10 +1,11 @@
 import { useParams } from "react-router-dom"
-import { ActionIcon, AppShell, Box, Flex, Group, Modal, Portal, Title } from "@mantine/core"
+import { ActionIcon, AppShell, Box, Flex, Group, Modal, Portal } from "@mantine/core"
 import { useDisclosure } from "@mantine/hooks"
 // 
 import SearchInput from "../components/SearchInput"
 import Results from "../components/Results"
 import Settings from "../components/Settings"
+import Brand from "../components/Brand"
 import useSettingsStore from "../stores/settings"
 
 function Root() {
@@ -20,7 +21,7 @@ function Root() {
     return (
         <AppShell
             header={{ height: headerHeight }}
-            maw={maxWidth} p={0} mx="auto"
+            maw={maxWidth} mx="auto"
         >
 
             <AppShell.Header style={{ boxShadow: "var(--mantine-shadow-md)" }}>
@@ -31,11 +32,7 @@ function Root() {
                     justify="space-between"
                 >
                     {/* Logo and title */}
-                    <Title order={1} size="h3" fw={400}>
-                        <Flex align="center" gap="sm">
-                            <i className="fa-solid fa-book" /> <span>Alt-Lexikon</span>
-                        </Flex>
-                    </Title>
+                    <Brand />
 
                     {/* Settings icon */}
                     <ActionIcon
@@ -90,9 +87,9 @@ function Root() {
 
                 {/* Results */}
                 <Box
-                    // considitional margin based on input position
-                    mt={settings.searchOnBottom ? undefined : inputHeight + " + " + inputMarginY + " * 2"}
-                    mb={settings.searchOnBottom ? inputHeight + " + " + inputMarginY + " * 2" : undefined}
+                    // conditional padding based on input position
+                    pt={settings.searchOnBottom ? undefined : inputHeight + " + " + inputMarginY + " * 2"}
+                    pb={settings.searchOnBottom ? inputHeight + " + " + inputMarginY + " * 2" : undefined}
                 >
                     <Results word={word} />
                 </Box>

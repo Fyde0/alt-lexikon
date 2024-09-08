@@ -79,7 +79,7 @@ function Word({ word }: { word: IWord }) {
     return (
         <Box
             px="sm" py="md"
-            style={{ borderBottom: "1px solid var(--mantine-color-dark-4)" }}
+            style={{ borderBottom: "1px solid var(--mantine-color-default-border)" }}
         >
             {/* Word header */}
             <Grid align="center">

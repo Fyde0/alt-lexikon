@@ -51,6 +51,7 @@ function SearchInput({ word }: { word: string | undefined }) {
                 onOptionSubmit={(option) => handleSubmit(option)}
                 withinPortal={false}
                 store={combobox}
+                width="97.5%" // keep this, it's for the dropdown
             >
                 <Grid maw="500px" mx="auto" px="md" align="center">
 
@@ -63,7 +64,7 @@ function SearchInput({ word }: { word: string | undefined }) {
 
                                 placeholder="Search dictionary"
 
-                                error={searchQuery.isError && searchQuery.error.message}
+                                error={searchQuery.isError}
                                 autoFocus={true}
 
                                 onFocus={(event) => {
@@ -83,7 +84,7 @@ function SearchInput({ word }: { word: string | undefined }) {
                             />
                         </Combobox.Target>
                     </Grid.Col>
-                    
+
                     {settings.showCharacters &&
                         <Grid.Col span="content">
                             <Group gap={2} align="center">
@@ -111,14 +112,20 @@ function SearchInput({ word }: { word: string | undefined }) {
 
                     {/* Search button */}
                     <Grid.Col span="content">
-                        <Button type="submit">Search</Button>
+                        <Button
+                            type="submit"
+                            color={searchQuery.isError ? "var(--mantine-color-red-9)" : undefined}
+                            px={searchQuery.isError ? "xs" : undefined}
+                        >
+                            {searchQuery.isError ? "Server error ☹️" : "Search"}
+                        </Button>
                     </Grid.Col>
 
                 </Grid>
 
                 {/* Search results */}
                 {searchQuery.isSuccess &&
-                    <Combobox.Dropdown>
+                    <Combobox.Dropdown maw="25rem">
                         <Combobox.Options>
                             {searchQuery.data.length === 0 && <Combobox.Empty>No results found</Combobox.Empty>}
                             {
