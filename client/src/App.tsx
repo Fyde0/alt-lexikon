@@ -1,13 +1,15 @@
 import ReactDOM from "react-dom/client"
+import { createBrowserRouter, RouterProvider } from "react-router-dom"
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query"
 import { createTheme, MantineProvider } from "@mantine/core"
 import "@mantine/core/styles.css"
 // 
 import "./assets/css/index.css"
 import Root from "./pages/Root"
-import { createBrowserRouter, RouterProvider } from "react-router-dom"
+import useSettingsStore from "./stores/settings"
 
 function App() {
+    const { settings } = useSettingsStore()
 
     // React Query
     const queryClient = new QueryClient({
@@ -22,7 +24,8 @@ function App() {
 
     // Mantine
     const theme = createTheme({
-        fontFamily: 'Montserrat, sans-serif'
+        fontFamily: "Montserrat, sans-serif",
+        primaryColor: settings.accentColor
     })
 
     // React Router

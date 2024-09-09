@@ -22,7 +22,7 @@ function SearchInput({ word }: { word: string | undefined }) {
     })
 
     // search options query
-    const searchQuery = searchWords({ query: form.values.query })
+    const searchQuery = searchWords({ query: form.values.query.toLowerCase() })
 
     // select first option when data changes
     useEffect(() => {
@@ -70,7 +70,9 @@ function SearchInput({ word }: { word: string | undefined }) {
                                 onFocus={(event) => {
                                     // selects the content when focused
                                     // (useful when autofocus)
-                                    event.currentTarget.select()
+                                    if (settings.selectQueryAfterSearch) {
+                                        event.currentTarget.select()
+                                    }
                                     // opens the dropdown when focused
                                     // but not on autofocus
                                     if (form.isTouched("query")) {
@@ -85,7 +87,7 @@ function SearchInput({ word }: { word: string | undefined }) {
                         </Combobox.Target>
                     </Grid.Col>
 
-                    {settings.showCharacters &&
+                    {settings.showCharactersButtons &&
                         <Grid.Col span="content">
                             <Group gap={2} align="center">
                                 <Button
