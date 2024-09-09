@@ -7,6 +7,7 @@ import { handleEntry, handleParenthesis, handleTranslations } from "./helpers/wo
 import Links from "./Links";
 import EntryList from "./EntryList";
 import useSettingsStore from "../../stores/settings";
+import { ReactNode } from "react";
 
 function Word({ word }: { word: IWord }) {
     const { settings } = useSettingsStore()
@@ -43,10 +44,16 @@ function Word({ word }: { word: IWord }) {
     const derivations = handleEntry(word.data?.derivation, otherFlag, true)
     const use = handleEntry(word.data?.use)
 
-    // TODO fix characters
-    // TODO add forvo link
     // doesn't have comments
+    // this is not IPA, I don't know what it is, I'm not using it
     const pronunciations = word.data?.phonetic?.map(pronun => "[" + pronun.value + "]").join(", ")
+    const pronunciationLink: ReactNode =
+        <a
+            href={"https://forvo.com/search/" + word.word.replace("|", "") + "/sv/"}
+            target="_blank"
+        >
+            Search on forvo.com
+        </a>
 
     const variants = word.data?.variant?.map(item => {
         let variant = ""
@@ -128,7 +135,7 @@ function Word({ word }: { word: IWord }) {
                 <Collapse in={opened}>
                     <Box mt="md">
                         {grammar && <Text>Grammar: {grammar}</Text>}
-                        {pronunciations && <Text>Pronunciation: {pronunciations}</Text>}
+                        {pronunciations && <Text>Pronunciation: {pronunciationLink}</Text>}
                         {explanation && <Text>Explanation: {explanation}</Text>}
                         {variants && <Text>Variants: {variants}</Text>}
                         {see && see.length > 0 && <Text>See: {" "} <Links links={see} /></Text>}

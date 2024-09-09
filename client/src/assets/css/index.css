@@ -5,3 +5,15 @@
     src:
         url(../fonts/Montserrat/Montserrat-VariableFont_wght.ttf) format("truetype");
 }
+
+a {
+    color: var(--mantine-color-text);
+}
+
+a:hover {
+    color: var(--mantine-primary-color-filled);
+}
+
+a:active {
+    color: var(--mantine-primary-color-filled-hover);
+}
