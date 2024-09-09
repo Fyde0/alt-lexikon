@@ -28,6 +28,7 @@ root = ET.fromstring(fixed)
 conn = sqlite3.connect(args.db)
 cursor = conn.cursor()
 
+
 def insertObject(obj, table, crsr):
     columns = ", ".join(obj.keys())
     placeholders = ", ".join(f":{key}" for key in obj.keys())
@@ -35,10 +36,12 @@ def insertObject(obj, table, crsr):
     crsr.execute(query, obj)
     return crsr.lastrowid
 
+
 for word in root:
 
     newWord = {}
-    newWord["word"] = word.get("value")
+    newWord["value"] = word.get("value")
+    newWord["clean_value"] = word.get("value").replace("|", "") # for search
     newWord["language"] = word.get("lang")
     newWord["class"] = word.get("class")
     newWord["comment"] = word.get("comment")
@@ -48,48 +51,93 @@ for word in root:
     translations = []
     compounds = []
     inflections = []
+    derivations = []
+    variants = []
 
     for child in word:
-        # translations, compounds ans inflections go in separate tables for better search
+
+        # separate tables only for search
+
+        # Translations
         if child.tag == "translation":
-            newTranslation = {}
-            newTranslation["value"] = child.get("value")
-            newTranslation["comment"] = child.get("comment")
-            translations.append(newTranslation)
+            transValue = child.get("value")
+            transValueNoUs = re.sub(
+                r"\s?\[US\]\s?", "", transValue
+            )  # not needed in search
+
+            # no () in all values, not needed in search
+            values = []
+
+            # no [], eg [school] term => school term
+            value1 = transValueNoUs.replace("[", "").replace("]", "").replace("(", "").replace(")", "").strip()
+            values.append(value1)
+
+            # no [] and content, eg [telephone] answering machine => answering machine
+            transValueNoSquares = re.sub(r"\s?\[.+?\]\s?", "", transValueNoUs)
+            value2 = transValueNoSquares.replace("(", "").replace(")", "").strip()
+            if value2 not in values:
+                values.append(value2)
+
+            # no [] and () and content, [phone-in radio programme] host (hostess) => host
+            value3 = re.sub(r"\s?\(.+?\)\s?", "", transValueNoSquares).strip()
+            if value3 not in values:
+                values.append(value3)
+
+            for value in values:
+                translations.append({"value": value})
+
+        # Compounds
         if child.tag == "compound":
             newCompound = {}
             newCompound["value"] = child.get("value")
+            newCompound["clean_value"] = child.get("value").replace("|", "") # for search
             newCompound["inflection"] = child.get("inflection")
-            newCompound["comment"] = child.get("comment")
             for compoundChild in child:
                 if compoundChild.tag == "translation":
                     newCompound["translation"] = compoundChild.get("value")
             compounds.append(newCompound)
+
+        # Inflections
         if child.tag == "paradigm":
             for paradigmChild in child:
                 if paradigmChild.tag == "inflection":
                     newInflection = {}
                     newInflection["value"] = paradigmChild.get("value")
-                    newInflection["comment"] = paradigmChild.get("comment")
                     inflections.append(newInflection)
-        # and also with everything else together
-        # not pretty but it helps in the client
+
+        # Derivations
+        if child.tag == "derivation":
+            newDerivation = {}
+            newDerivation["value"] = child.get("value")
+            newDerivation["inflection"] = child.get("inflection")
+            for derivChild in child:
+                if derivChild.tag == "translation":
+                    newDerivation["translation"] = derivChild.get("value")
+            derivations.append(newDerivation)
+
+        # Variants
+        if child.tag == "variant":
+            newVariant = {}
+            newVariant["value"] = child.get("value")
+            variants.append(newVariant)
+
+        # all data also in main table for client
         newChild = defaultdict(list)
         for attrib in child.items():
-            newChild[attrib[0]] = attrib[1]
+            newChild[attrib[0]] = attrib[1].strip()
 
-        # for example/translation, paradigm/inflection, idiom/translation
+        # for nested elements
         for childChild in child:
             newChildChild = {}
             for attrib in childChild.items():
-                newChildChild[attrib[0]] = attrib[1]
+                newChildChild[attrib[0]] = attrib[1].strip()
             newChild[childChild.tag].append(newChildChild)
 
         rest[child.tag].append(newChild)
 
     if rest:
         newWord["rest"] = json.dumps(rest)
-    
+
     wordId = insertObject(newWord, "Words", cursor)
     for translation in translations:
         translation["word_id"] = wordId
@@ -100,6 +148,12 @@ for word in root:
     for compound in compounds:
         compound["word_id"] = wordId
         insertObject(compound, "Compounds", cursor)
+    for deriv in derivations:
+        deriv["word_id"] = wordId
+        insertObject(deriv, "Derivations", cursor)
+    for variant in variants:
+        variant["word_id"] = wordId
+        insertObject(variant, "Variants", cursor)
 
 conn.commit()
 conn.close()

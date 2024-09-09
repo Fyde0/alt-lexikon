@@ -1,50 +1,15 @@
 interface IWord {
     id: number,
-    word: string,
+    value: string,
     language: "en" | "sv",
     class?: string,
     comment?: string,
-    data?: IWordData
-}
-
-interface IWordData {
-    translation?: WordDataEntry[]
-    grammar?: WordDataEntry[]
-    phonetic?: WordDataEntry[]
-    variant?: Variant[]
-    paradigm?: Paradigm[]
-    synonym?: Synonym[]
-    definition?: WordDataEntry[]
-    example?: WordDataEntryWithTranslation[]
-    idiom?: WordDataEntryWithTranslation[]
-    explanation?: WordDataEntryWithTranslation[]
-}
-
-type WordDataEntry = {
-    value: string,
-    comment?: string
-}
-
-type WordDataEntryWithTranslation = WordDataEntry & {
-    translation: WordDataEntry[]
-}
-
-type Variant = WordDataEntry & {
-    alt?: string
-}
-
-type Paradigm = {
-    inflection: WordDataEntry[]
-}
-
-type Synonym = {
-    value: string,
-    level: string
+    data?: any
 }
 
 export function isIWord(obj: any): obj is IWord {
     return typeof obj.id === "number" &&
-        typeof obj.word === "string" &&
+        typeof obj.value === "string" &&
         (obj.language === "en" || obj.language === "sv")
 }
 
