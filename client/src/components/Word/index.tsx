@@ -14,9 +14,7 @@ function Word({ word }: { word: IWord }) {
     // handles expand/collapse
     const [opened, { toggle }] = useDisclosure(settings.expandResults)
 
-    // TODO normalize translation handling
-    // TODO change link color, add links to all words?
-    // TODO check which elements have comments
+    // TODO add links to words and translations?
     // TODO some things in italics?
 
     // ignoring the url property since it only has sfw files 🪦
@@ -49,7 +47,7 @@ function Word({ word }: { word: IWord }) {
     const pronunciations = word.data?.phonetic?.map(pronun => "[" + pronun.value + "]").join(", ")
     const pronunciationLink: ReactNode =
         <a
-            href={"https://forvo.com/search/" + word.word.replace("|", "") + "/sv/"}
+            href={"https://forvo.com/search/" + word.value.replace("|", "") + "/sv/"}
             target="_blank"
         >
             Search on forvo.com
@@ -94,7 +92,7 @@ function Word({ word }: { word: IWord }) {
                 {/* Word, flags, classes, comments and translations */}
                 <Grid.Col span="auto">
                     {flag} {" "}
-                    <Text span fw={700}>{word.word}</Text> {" "}
+                    <Text span fw={700}>{word.value}</Text> {" "}
                     {classes}
                     {word.comment && " (" + word.comment + ")"}
                     {translations &&

@@ -1,6 +1,6 @@
 interface IWord {
     id: number,
-    word: string,
+    value: string,
     language: "en" | "sv",
     class?: string,
     comment?: string,
@@ -61,7 +61,7 @@ type Synonym = WordDataEntry & {
 
 export function isIWord(obj: any): obj is IWord {
     return typeof obj.id === "number" &&
-        typeof obj.word === "string" &&
+        typeof obj.value === "string" &&
         (obj.language === "en" || obj.language === "sv")
 }
 

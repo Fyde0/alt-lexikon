@@ -17,10 +17,17 @@ function Results({ word }: { word: string | undefined }) {
     }
 
     if (getWordQuery.isError) {
-        console.error(getWordQuery.error.message)
         return (
             <Center h={100} ta="center">
-                <ErrorMessage />
+                {
+                    getWordQuery.error.message.includes("No results")
+                        ?
+                        <Box>
+                            No results for <Text span fs="italic">{word}</Text>
+                        </Box>
+                        :
+                        <ErrorMessage />
+                }
             </Center>
         )
     }
