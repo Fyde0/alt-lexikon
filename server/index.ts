@@ -1,14 +1,19 @@
 import express, { Request, Response, NextFunction } from "express"
 import Database from "better-sqlite3"
 import cors from "cors"
+import helmet from "helmet"
 // 
 import { logDebug, logInfo } from "./helpers/log"
 import searchController from "./controllers/words"
 
+// TODO debug logs
+
 const app = express()
 const port = 3000
 
-// TODO debug logs
+app.use(cors())
+app.use(helmet())
+app.disable('x-powered-by')
 
 // Fake delay
 // app.use((req: Request, res: Response, next: NextFunction) => {
@@ -28,10 +33,9 @@ const buffer = file_db.serialize()
 file_db.close()
 
 logDebug("Copying database to memory")
-export const mem_db = new Database(buffer)
+export const mem_db = new Database(buffer, { readonly: true })
 
-// app.use(cors())
-
+// logging
 app.use((req: Request, res: Response, next: NextFunction) => {
     logInfo(`METHOD: [${req.method}] - URL: [${req.url}] - IP: [${req.ip}]`)
     next()
@@ -41,6 +45,11 @@ app.use((req: Request, res: Response, next: NextFunction) => {
 app.get("/words", searchController.searchWords)
 app.get("/words/:word", searchController.specificWord)
 
+// fallback 404
+app.use((req, res, next) => {
+    res.status(404).send("¯\\(º_o)/¯")
+})
+
 app.listen(port, () => {
-    logInfo("Server started")
+    logInfo("Server listening on port " + port)
 })

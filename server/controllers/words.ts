@@ -1,9 +1,9 @@
 import { Request, Response } from "express"
-import { z } from "zod"
 // 
 import { mem_db } from ".."
 import { serverError } from "../helpers/serverError"
 import { logDebug } from "../helpers/log"
+import queryValidationSchema from "../helpers/queryValidationSchema"
 import { isIMatchArray } from "../interfaces/match"
 import { isIWordDBArray } from "../interfaces/wordDB"
 import IWord from "../interfaces/word"
@@ -12,9 +12,7 @@ function searchWords(req: Request, res: Response) {
     const { query } = req.query
     logDebug("Searching query: " + query)
 
-    const validationResult = z.object({
-        query: z.coerce.string().max(50, "Too long!")
-    }).safeParse({ query })
+    const validationResult = queryValidationSchema.safeParse({ query })
 
     if (!validationResult.success) {
         // 422 Unprocessable Content
@@ -60,6 +58,7 @@ function searchWords(req: Request, res: Response) {
             OR Compounds.clean_value LIKE :query
             OR Derivations.value LIKE :query
             OR Variants.value LIKE :query
+            COLLATE NOCASE
     `
     const parameters = { "query": query + "%" }
 
@@ -118,6 +117,14 @@ function specificWord(req: Request, res: Response) {
     const { word } = req.params
     logDebug("Getting word: " + word)
 
+    const validationResult = queryValidationSchema.safeParse({ word })
+
+    if (!validationResult.success) {
+        // 422 Unprocessable Content
+        logDebug("Validation failed for query: " + word)
+        return res.status(422).json({ "error": validationResult.error.issues[0].message })
+    }
+
     // search query
     // the original website searches in the middle of translations but I don't think that's right
     // e.g. "road" finds "avfart" because the translation is "exit (road)"
@@ -144,6 +151,7 @@ function specificWord(req: Request, res: Response) {
         OR Compounds.clean_value = :word
         OR Derivations.value = :word
         OR Variants.value = :word
+        COLLATE NOCASE
     `
     const parameters = { "word": word }
 
@@ -179,15 +187,6 @@ function specificWord(req: Request, res: Response) {
         if (a.key === "Compound" && b.key === "Compound") { return a.id - b.id }
         if (a.key === "Compound") return -1
         if (b.key === "Compound") return 1
-        // I don't think this is needed
-        //                v
-        // then, exact word match
-        // keep DB order if same word
-        // if (a.word === word && b.word === word) {
-        //     return a.id - b.id
-        // }
-        // if (a.word === word) return -1
-        // if (b.word === word) return 1
         return 0
     })
 
