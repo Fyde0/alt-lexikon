@@ -5,10 +5,21 @@ import Word from "../Word"
 import ErrorMessage from "../ErrorMessage"
 import { getWord } from "../../api/words"
 import useSettingsStore from "../../stores/settings"
+import queryValidationSchema from "../../helpers/queryValidationSchema"
 
 function Results({ word }: { word: string | undefined }) {
     const navigate = useNavigate()
     const { settings } = useSettingsStore()
+
+    const wordValidation = queryValidationSchema.safeParse({ query: word })
+
+    if (!wordValidation.success) {
+        return (
+            <Center h={100} ta="center">
+                {wordValidation.error.issues[0].message}
+            </Center>
+        )
+    }
 
     const getWordQuery = getWord({ word: word })
 
@@ -36,6 +47,7 @@ function Results({ word }: { word: string | undefined }) {
         )
     }
 
+    // searches a word when double clicking it
     function handleDoubleClick() {
         if (settings.doubleClickToSearch) {
             const selection = window.getSelection()?.toString()
