@@ -2,6 +2,7 @@ import express, { Request, Response, NextFunction } from "express"
 import Database from "better-sqlite3"
 import cors from "cors"
 import helmet from "helmet"
+import { rateLimit } from 'express-rate-limit'
 // 
 import { logDebug, logInfo } from "./helpers/log"
 import searchController from "./controllers/words"
@@ -9,21 +10,32 @@ import searchController from "./controllers/words"
 // TODO debug logs
 
 const app = express()
-const port = 3000
-
-app.use(cors())
-app.use(helmet())
-app.disable('x-powered-by')
+const port = process.env.PORT || "3000"
 
 // Fake delay
 // app.use((req: Request, res: Response, next: NextFunction) => {
 //     setTimeout(next, 1000)
 // })
 
+app.use(cors())
+app.use(helmet())
+app.disable('x-powered-by')
+
+// rate limiter, 100 requests per minute
+const limiter = rateLimit({
+	windowMs: 1 * 60 * 1000,
+	limit: 100,
+	standardHeaders: 'draft-7',
+	legacyHeaders: false
+})
+
+app.use(limiter)
+
 // open db
 // TODO check if db is correct (maybe do a test query?)
 logDebug("Opening database file")
-const file_db = new Database("words.db", { readonly: true })
+const db_file = process.env.DB_FILE || "words.db"
+const file_db = new Database(db_file, { readonly: true })
 
 // DON'T DO THIS
 // file_db.pragma("journal_mode = WAL")

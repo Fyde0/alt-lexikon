@@ -1,0 +1,41 @@
+run-name: Deploy
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - deploy
+jobs:
+  deploy:
+    environment: Deploy
+    runs-on: ubuntu-latest
+    steps:
+      - name: check if correct branch
+        if: github.ref != 'refs/heads/deploy'
+        run: |
+          echo "This workflow can only be triggered on the deploy branch"
+          exit 1
+      - name: deploy
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.HOST }}
+          username: ${{ secrets.USERNAME }}
+          password: ${{ secrets.PASSWORD }}
+          port: ${{ secrets.PORT }}
+          key: ${{ secrets.KEY }}
+          script_stop: true
+          script: |
+            source ${{ secrets.ENV_FILE }}
+            cd ${{ secrets.WORK_DIR }}
+            git fetch origin
+            git reset --hard origin/deploy
+            cd server
+            npm install
+            npm run build
+            sudo systemctl restart ${{ secrets.SERVICE_NAME }}
+            cd ${{ secrets.WORK_DIR }}
+            cd client
+            cp ${{ secrets.APP_ENV_FILE }} .env
+            npm install
+            npm run build -- $BUILD_OPTIONS
+            cp -r dist/* ${{ secrets.SERVE_DIR }}
+            rm .env

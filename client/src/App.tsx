@@ -34,7 +34,9 @@ function App() {
             path: "/:word?",
             element: <Root />
         }
-    ])
+    ],
+        { basename: import.meta.env.BASE_URL }
+    )
 
     return (
         <MantineProvider defaultColorScheme="dark" theme={theme}>
