@@ -1,6 +1,7 @@
 import { useEffect } from "react";
 import { Button, Combobox, Grid, Group, Kbd, Loader, TextInput, useCombobox } from "@mantine/core";
 import { useForm } from '@mantine/form';
+import { z } from "zod";
 // 
 import { searchWords } from "../api/words"
 import { useNavigate } from "react-router-dom";
@@ -21,8 +22,19 @@ function SearchInput({ word }: { word: string | undefined }) {
         }
     })
 
+    // not using mantine's form validation because it's annoying
+    const queryValidation = z.object({
+        query: z.string()
+            .max(50, "Too long!")
+            // characters from database
+            .regex(/^$|^[a-zA-Z0-9\s.,!?-ÄÅÖàâäåèéêôöüÀÂÃáçíîï/:; ]+$/, {
+                message: "Can't use that character!",
+            }).optional()
+    }).safeParse({ query: form.values.query })
+
     // search options query
-    const searchQuery = searchWords({ query: form.values.query.toLowerCase() })
+    // only run if no validation errors
+    const searchQuery = searchWords({ query: queryValidation.success ? form.values.query : "" })
 
     // select first option when data changes
     useEffect(() => {
@@ -36,20 +48,19 @@ function SearchInput({ word }: { word: string | undefined }) {
     }
 
     function handleSubmit(word: string) {
-        combobox.closeDropdown()
-        navigate("/" + word)
+        if (!searchQuery.isError && queryValidation.success) {
+            combobox.closeDropdown()
+            navigate("/" + word)
+        }
     }
 
     return (
         // onSubmit for Enter key
-        <form
-            onSubmit={form.onSubmit(() => handleSubmit(form.values.query))}
-            style={{ width: "100%" }}
-        >
+        <form onSubmit={form.onSubmit(() => handleSubmit(form.values.query))} style={{ width: "100%" }}>
             <Combobox
                 // onSubmit for when selecting an option in the list
                 onOptionSubmit={(option) => handleSubmit(option)}
-                withinPortal={false}
+                withinPortal={false} // need this for some reason
                 store={combobox}
                 width="97.5%" // keep this, it's for the dropdown
             >
@@ -64,7 +75,7 @@ function SearchInput({ word }: { word: string | undefined }) {
 
                                 placeholder="Search dictionary"
 
-                                error={searchQuery.isError}
+                                error={searchQuery.isError || !queryValidation.success}
                                 autoFocus={true}
 
                                 onFocus={(event) => {
@@ -116,10 +127,9 @@ function SearchInput({ word }: { word: string | undefined }) {
                     <Grid.Col span="content">
                         <Button
                             type="submit"
-                            color={searchQuery.isError ? "var(--mantine-color-red-9)" : undefined}
-                            px={searchQuery.isError ? "xs" : undefined}
+                            disabled={searchQuery.isError || !queryValidation.success}
                         >
-                            {searchQuery.isError ? "Server error ☹️" : "Search"}
+                            Search
                         </Button>
                     </Grid.Col>
 

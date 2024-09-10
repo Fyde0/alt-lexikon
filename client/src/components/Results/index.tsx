@@ -10,7 +10,7 @@ function Results({ word }: { word: string | undefined }) {
     const navigate = useNavigate()
     const { settings } = useSettingsStore()
 
-    const getWordQuery = getWord({ word: word?.toLowerCase() })
+    const getWordQuery = getWord({ word: word })
 
     if (getWordQuery.isFetching) {
         return (

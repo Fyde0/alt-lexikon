@@ -7,8 +7,6 @@ function Settings() {
     const { setColorScheme } = useMantineColorScheme({ keepTransitions: true })
     const computedColorScheme = useComputedColorScheme()
 
-    console.log(settings)
-
     return (
         <Stack>
             <Checkbox
@@ -46,9 +44,10 @@ function Settings() {
             />
             <Text component="label">Accent color
                 <Group mt="sm">
-                    {accentColors.map(color => {
+                    {accentColors.map((color, i) => {
                         return (
                             <ColorSwatch
+                                key={i}
                                 component="button"
                                 color={"var(--mantine-color-" + color + "-filled)"}
                                 onClick={() => setSettings({ ...settings, accentColor: color })}

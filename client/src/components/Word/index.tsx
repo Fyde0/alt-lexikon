@@ -14,7 +14,6 @@ function Word({ word }: { word: IWord }) {
     // handles expand/collapse
     const [opened, { toggle }] = useDisclosure(settings.expandResults)
 
-    // TODO add links to words and translations?
     // TODO some things in italics?
 
     // ignoring the url property since it only has sfw files 🪦
