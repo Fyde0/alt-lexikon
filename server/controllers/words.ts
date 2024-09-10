@@ -1,7 +1,7 @@
 import { Request, Response } from "express"
 import { z } from "zod"
 // 
-import { file_db } from ".."
+import { mem_db } from ".."
 import { serverError } from "../helpers/serverError"
 import { logDebug } from "../helpers/log"
 import { isIMatchArray } from "../interfaces/match"
@@ -65,7 +65,7 @@ function searchWords(req: Request, res: Response) {
 
     logDebug("Running query: " + query)
 
-    const results = file_db
+    const results = mem_db
         .prepare(sqlQuery)
         .all(parameters)
 
@@ -149,7 +149,7 @@ function specificWord(req: Request, res: Response) {
 
     logDebug("Running query for word: " + word)
 
-    const results = file_db
+    const results = mem_db
         .prepare(sqlQuery)
         .all(parameters)
 

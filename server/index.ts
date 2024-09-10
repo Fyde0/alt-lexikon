@@ -17,12 +17,20 @@ const port = 3000
 
 // open db
 // TODO check if db is correct (maybe do a test query?)
-logDebug("Opening database")
-export const file_db = new Database("words.db")
-// for better performance
-file_db.pragma("journal_mode = WAL")
+logDebug("Opening database file")
+const file_db = new Database("words.db", { readonly: true })
 
-app.use(cors())
+// DON'T DO THIS
+// file_db.pragma("journal_mode = WAL")
+
+// copy db to memory
+const buffer = file_db.serialize()
+file_db.close()
+
+logDebug("Copying database to memory")
+export const mem_db = new Database(buffer)
+
+// app.use(cors())
 
 app.use((req: Request, res: Response, next: NextFunction) => {
     logInfo(`METHOD: [${req.method}] - URL: [${req.url}] - IP: [${req.ip}]`)
