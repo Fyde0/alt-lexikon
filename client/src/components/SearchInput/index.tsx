@@ -1,11 +1,12 @@
 import { useEffect } from "react";
-import { Button, Combobox, Grid, Group, Kbd, Loader, TextInput, useCombobox } from "@mantine/core";
-import { useForm } from '@mantine/form';
-import { z } from "zod";
-// 
-import { searchWords } from "../api/words"
 import { useNavigate } from "react-router-dom";
-import useSettingsStore from "../stores/settings";
+import { Button, Combobox, Grid, Loader, TextInput, useCombobox } from "@mantine/core";
+import { useForm } from '@mantine/form';
+// 
+import { searchWords } from "../../api/words"
+import useSettingsStore from "../../stores/settings";
+import SwedishCharactersButtons from "./SwedishCharactersButtons";
+import queryValidationSchema from "../../helpers/queryValidationSchema";
 
 function SearchInput({ word }: { word: string | undefined }) {
     const { settings } = useSettingsStore()
@@ -23,14 +24,7 @@ function SearchInput({ word }: { word: string | undefined }) {
     })
 
     // not using mantine's form validation because it's annoying
-    const queryValidation = z.object({
-        query: z.string()
-            .max(50, "Too long!")
-            // characters from database
-            .regex(/^$|^[a-zA-Z0-9\s.,!?-ÄÅÖàâäåèéêôöüÀÂÃáçíîï/:; ]+$/, {
-                message: "Can't use that character!",
-            }).optional()
-    }).safeParse({ query: form.values.query })
+    const queryValidation = queryValidationSchema.safeParse({ query: form.values.query })
 
     // search options query
     // only run if no validation errors
@@ -40,12 +34,6 @@ function SearchInput({ word }: { word: string | undefined }) {
     useEffect(() => {
         combobox.selectFirstOption()
     }, [searchQuery.data])
-
-    // appends characters to input field, used for å, ä, ö
-    function appendToInput(char: string) {
-        form.setFieldValue("query", form.values.query + char)
-        form.getInputNode("query")?.focus()
-    }
 
     function handleSubmit(word: string) {
         if (!searchQuery.isError && queryValidation.success) {
@@ -98,35 +86,16 @@ function SearchInput({ word }: { word: string | undefined }) {
                         </Combobox.Target>
                     </Grid.Col>
 
+                    {/* åäö buttons */}
                     {settings.showCharactersButtons &&
                         <Grid.Col span="content">
-                            <Group gap={2} align="center">
-                                <Button
-                                    variant="transparent" p={0} m={0}
-                                    onClick={() => appendToInput("å")}
-                                >
-                                    <Kbd size="md">å</Kbd>
-                                </Button>
-                                <Button
-                                    variant="transparent" p={0} m={0}
-                                    onClick={() => appendToInput("ö")}
-                                >
-                                    <Kbd size="md">ö</Kbd>
-                                </Button>
-                                <Button
-                                    variant="transparent" p={0} m={0}
-                                    onClick={() => appendToInput("ä")}
-                                >
-                                    <Kbd size="md">ä</Kbd>
-                                </Button>
-                            </Group>
+                            <SwedishCharactersButtons form={form} inputName="query" />
                         </Grid.Col>
                     }
 
                     {/* Search button */}
                     <Grid.Col span="content">
-                        <Button
-                            type="submit"
+                        <Button type="submit"
                             disabled={searchQuery.isError || !queryValidation.success}
                         >
                             Search
