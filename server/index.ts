@@ -20,6 +20,8 @@ const port = process.env.PORT || "3000"
 app.use(cors())
 app.use(helmet())
 app.disable('x-powered-by')
+// Trust proxy on local network (reverse proxy)
+app.set("trust proxy", "loopback")
 
 // rate limiter, 100 requests per minute
 const limiter = rateLimit({
