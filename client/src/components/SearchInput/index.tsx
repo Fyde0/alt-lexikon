@@ -6,7 +6,7 @@ import { useForm } from '@mantine/form';
 import { searchWords } from "../../api/words"
 import useSettingsStore from "../../stores/settings";
 import SwedishCharactersButtons from "./SwedishCharactersButtons";
-import queryValidationSchema from "../../helpers/queryValidationSchema";
+import validateQuery from "../../helpers/validateQuery";
 
 function SearchInput({ word }: { word: string | undefined }) {
     const { settings } = useSettingsStore()
@@ -24,7 +24,8 @@ function SearchInput({ word }: { word: string | undefined }) {
     })
 
     // not using mantine's form validation because it's annoying
-    const queryValidation = queryValidationSchema.safeParse({ query: form.values.query })
+    // const queryValidation = queryValidationSchema.safeParse({ query: form.values.query })
+    const queryValidation = validateQuery(form.values.query)
 
     // search options query
     // only run if no validation errors

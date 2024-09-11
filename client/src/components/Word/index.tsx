@@ -1,3 +1,4 @@
+import { ReactNode } from "react";
 import { ActionIcon, Box, Collapse, Grid, Text } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
 // 
@@ -7,7 +8,6 @@ import { handleEntry, handleParenthesis, handleTranslations } from "./helpers/wo
 import Links from "./Links";
 import EntryList from "./EntryList";
 import useSettingsStore from "../../stores/settings";
-import { ReactNode } from "react";
 
 function Word({ word }: { word: IWord }) {
     const { settings } = useSettingsStore()
@@ -114,13 +114,18 @@ function Word({ word }: { word: IWord }) {
                 {word.data && Object.keys(word.data).some(key => key !== "translation") &&
                     <Grid.Col span="content">
                         <ActionIcon variant="subtle" aria-label="Expand entry" onClick={toggle} style={{ float: "right" }}>
-                            <i
-                                className="fa-solid fa-chevron-down"
+                            <svg
+                                xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"
+                                fill="var(--mantine-primary-color-4)"
+                                height="1em" width="1em"
                                 style={{
                                     transform: opened ? "rotate(180deg)" : "rotate(0)",
                                     transition: "all 0.35s ease"
                                 }}
-                            />
+                            >
+                                {/* <!--!Font Awesome Free 6.6.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free Copyright 2024 Fonticons, Inc.--> */}
+                                <path d="M233.4 406.6c12.5 12.5 32.8 12.5 45.3 0l192-192c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0L256 338.7 86.6 169.4c-12.5-12.5-32.8-12.5-45.3 0s-12.5 32.8 0 45.3l192 192z" />
+                            </svg>
                         </ActionIcon>
                     </Grid.Col>
                 }

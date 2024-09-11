@@ -5,20 +5,21 @@ import Word from "../components/Word"
 import ErrorMessage from "../components/ErrorMessage"
 import { getWord } from "../api/words"
 import useSettingsStore from "../stores/settings"
-import queryValidationSchema from "../helpers/queryValidationSchema"
+import validateQuery from "../helpers/validateQuery"
 
 export function Component() {
     const { word } = useParams()
     const navigate = useNavigate()
     const { settings } = useSettingsStore()
 
-    const wordValidation = queryValidationSchema.safeParse({ query: word })
+    // const wordValidation = queryValidationSchema.safeParse({ query: word })
+    const wordValidation = validateQuery(word)
     const getWordQuery = getWord({ word: wordValidation.success ? word : "" })
 
     if (!wordValidation.success) {
         return (
             <Center h={100} ta="center">
-                {wordValidation.error.issues[0].message}
+                {wordValidation.message}
             </Center>
         )
     }
