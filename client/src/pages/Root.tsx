@@ -1,9 +1,8 @@
-import { useParams } from "react-router-dom"
+import { Outlet, useParams } from "react-router-dom"
 import { ActionIcon, AppShell, Box, Flex, Group, Modal, Portal } from "@mantine/core"
 import { useDisclosure } from "@mantine/hooks"
 // 
 import SearchInput from "../components/SearchInput"
-import Results from "../components/Results"
 import Settings from "../components/Settings"
 import Brand from "../components/Brand"
 import useSettingsStore from "../stores/settings"
@@ -91,7 +90,7 @@ function Root() {
                     pt={settings.searchOnBottom ? undefined : inputHeight + " + " + inputMarginY + " * 2"}
                     pb={settings.searchOnBottom ? inputHeight + " + " + inputMarginY + " * 2" : undefined}
                 >
-                    <Results word={word} />
+                    <Outlet />
                 </Box>
 
             </AppShell.Main>

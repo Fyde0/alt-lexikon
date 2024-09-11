@@ -1,17 +1,19 @@
-import { useNavigate } from "react-router-dom"
+import { useNavigate, useParams } from "react-router-dom"
 import { Box, Center, Loader, Stack, Text } from "@mantine/core"
 // 
-import Word from "../Word"
-import ErrorMessage from "../ErrorMessage"
-import { getWord } from "../../api/words"
-import useSettingsStore from "../../stores/settings"
-import queryValidationSchema from "../../helpers/queryValidationSchema"
+import Word from "../components/Word"
+import ErrorMessage from "../components/ErrorMessage"
+import { getWord } from "../api/words"
+import useSettingsStore from "../stores/settings"
+import queryValidationSchema from "../helpers/queryValidationSchema"
 
-function Results({ word }: { word: string | undefined }) {
+export function Component() {
+    const { word } = useParams()
     const navigate = useNavigate()
     const { settings } = useSettingsStore()
 
     const wordValidation = queryValidationSchema.safeParse({ query: word })
+    const getWordQuery = getWord({ word: wordValidation.success ? word : "" })
 
     if (!wordValidation.success) {
         return (
@@ -20,8 +22,6 @@ function Results({ word }: { word: string | undefined }) {
             </Center>
         )
     }
-
-    const getWordQuery = getWord({ word: word })
 
     if (getWordQuery.isFetching) {
         return (
@@ -74,5 +74,3 @@ function Results({ word }: { word: string | undefined }) {
         )
     }
 }
-
-export default Results

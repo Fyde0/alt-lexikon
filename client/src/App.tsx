@@ -31,8 +31,18 @@ function App() {
     // React Router
     const router = createBrowserRouter([
         {
-            path: "/:word?",
-            element: <Root />
+            path: "/",
+            element: <Root />,
+            children: [
+                {
+                    path: "/",
+                    lazy: () => import("./pages/Home")
+                },
+                {
+                    path: "/:word?",
+                    lazy: () => import("./pages/Results")
+                }
+            ]
         }
     ],
         { basename: import.meta.env.BASE_URL }
