@@ -1,11 +1,13 @@
-import { Text, Checkbox, CheckIcon, ColorSwatch, Group, rem, Stack, useComputedColorScheme, useMantineColorScheme } from "@mantine/core"
+import { Text, Checkbox, CheckIcon, ColorSwatch, Group, rem, Stack, useComputedColorScheme, useMantineColorScheme, DEFAULT_THEME, useCombobox, Combobox, InputBase } from "@mantine/core"
 import useSettingsStore from "../stores/settings"
-import { accentColors } from "../interfaces/settings"
+import { accentColors, Font, fonts } from "../interfaces/settings"
 
 function Settings() {
     const { settings, setSettings } = useSettingsStore()
     const { setColorScheme } = useMantineColorScheme({ keepTransitions: true })
     const computedColorScheme = useComputedColorScheme()
+
+    const combobox = useCombobox()
 
     return (
         <Stack>
@@ -42,6 +44,7 @@ function Settings() {
                 checked={settings.doubleClickToSearch}
                 onChange={() => setSettings({ ...settings, doubleClickToSearch: !settings.doubleClickToSearch })}
             />
+
             <Text component="label">Accent color
                 <Group mt="sm">
                     {accentColors.map((color, i) => {
@@ -58,6 +61,39 @@ function Settings() {
                         )
                     })}
                 </Group>
+            </Text>
+
+            <Text component="label">Font
+                <Combobox
+                    store={combobox} withinPortal={false}
+                    onOptionSubmit={(value) => {
+                        setSettings({ ...settings, font: value as Font || DEFAULT_THEME.fontFamily })
+                    }}
+                >
+                    <Combobox.Target>
+                        <InputBase
+                            component="button" type="button" pointer
+                            rightSection={<Combobox.Chevron />}
+                            onClick={() => combobox.toggleDropdown()}
+                            mt="sm" maw="15rem"
+                        >
+                            {settings.font}
+                        </InputBase>
+                    </Combobox.Target>
+
+                    <Combobox.Dropdown>
+                        <Combobox.Options>
+                            {fonts.map((item) => (
+                                <Combobox.Option value={item} key={item}>
+                                    <Group gap="xs">
+                                        {item === settings.font && <CheckIcon size={12} />}
+                                        <Text span ff={item}>{item}</Text>
+                                    </Group>
+                                </Combobox.Option>
+                            ))}
+                        </Combobox.Options>
+                    </Combobox.Dropdown>
+                </Combobox>
             </Text>
         </Stack>
     )
