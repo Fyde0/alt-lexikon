@@ -14,7 +14,7 @@ export const defaultSettings: ISettings = {
     expandResults: false,
     searchOnBottom: false,
     showCharactersButtons: false,
-    selectQueryAfterSearch: true,
+    selectQueryAfterSearch: false,
     doubleClickToSearch: true
 }
 
