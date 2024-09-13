@@ -41,22 +41,18 @@ for word in root:
 
     newWord = {}
     newWord["value"] = word.get("value")
-    newWord["clean_value"] = word.get("value").replace("|", "") # for search
     newWord["language"] = word.get("lang")
     newWord["class"] = word.get("class")
     newWord["comment"] = word.get("comment")
 
     rest = defaultdict(list)
 
-    translations = []
-    compounds = []
-    inflections = []
-    derivations = []
-    variants = []
+    matches = []
+    matches.append({"value": word.get("value").replace("|", ""), "key": "Word"})
 
     for child in word:
 
-        # separate tables only for search
+        # separate match table for search
 
         # Translations
         if child.tag == "translation":
@@ -84,42 +80,27 @@ for word in root:
                 values.append(value3)
 
             for value in values:
-                translations.append({"value": value})
+                matches.append({"value": value, "key": "Translation"})
 
         # Compounds
         if child.tag == "compound":
-            newCompound = {}
-            newCompound["value"] = child.get("value")
-            newCompound["clean_value"] = child.get("value").replace("|", "") # for search
-            newCompound["inflection"] = child.get("inflection")
-            for compoundChild in child:
-                if compoundChild.tag == "translation":
-                    newCompound["translation"] = compoundChild.get("value")
-            compounds.append(newCompound)
+            cleanValue = child.get("value").replace("|", "")
+            matches.append({"value": cleanValue, "key": "Compound"})
 
         # Inflections
         if child.tag == "paradigm":
             for paradigmChild in child:
                 if paradigmChild.tag == "inflection":
-                    newInflection = {}
-                    newInflection["value"] = paradigmChild.get("value")
-                    inflections.append(newInflection)
+                    matches.append({"value": paradigmChild.get("value"), "key": "Inflection"})
+
 
         # Derivations
         if child.tag == "derivation":
-            newDerivation = {}
-            newDerivation["value"] = child.get("value")
-            newDerivation["inflection"] = child.get("inflection")
-            for derivChild in child:
-                if derivChild.tag == "translation":
-                    newDerivation["translation"] = derivChild.get("value")
-            derivations.append(newDerivation)
+            matches.append({"value": child.get("value"), "key": "Derivation"})
 
         # Variants
         if child.tag == "variant":
-            newVariant = {}
-            newVariant["value"] = child.get("value")
-            variants.append(newVariant)
+            matches.append({"value": child.get("value"), "key": "Variant"})
 
         # all data also in main table for client
         newChild = defaultdict(list)
@@ -139,21 +120,9 @@ for word in root:
         newWord["rest"] = json.dumps(rest)
 
     wordId = insertObject(newWord, "Words", cursor)
-    for translation in translations:
-        translation["word_id"] = wordId
-        insertObject(translation, "Translations", cursor)
-    for inflection in inflections:
-        inflection["word_id"] = wordId
-        insertObject(inflection, "Inflections", cursor)
-    for compound in compounds:
-        compound["word_id"] = wordId
-        insertObject(compound, "Compounds", cursor)
-    for deriv in derivations:
-        deriv["word_id"] = wordId
-        insertObject(deriv, "Derivations", cursor)
-    for variant in variants:
-        variant["word_id"] = wordId
-        insertObject(variant, "Variants", cursor)
+    for matchObj in matches:
+        matchObj["word_id"] = wordId
+        insertObject(matchObj, "Matches", cursor)
 
 conn.commit()
 conn.close()

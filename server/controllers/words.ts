@@ -26,38 +26,13 @@ function searchWords(req: Request, res: Response) {
     // everything is without ( and ), clean_value is without |
     let sqlQuery = `
             SELECT DISTINCT
-                Words.clean_value AS word, 
+                Words.value AS word, 
                 Words.language, 
-                CASE
-                    WHEN Words.clean_value LIKE :query THEN Words.clean_value
-                    WHEN Translations.value LIKE :query THEN Translations.value
-                    WHEN Inflections.value LIKE :query THEN Inflections.value
-                    WHEN Compounds.clean_value LIKE :query THEN Compounds.clean_value
-                    WHEN Derivations.value LIKE :query THEN Derivations.value
-                    WHEN Variants.value LIKE :query THEN Variants.value
-                    ELSE NULL
-                END AS match,
-                CASE 
-                    WHEN Words.clean_value LIKE :query THEN 'Word'
-                    WHEN Translations.value LIKE :query THEN 'Translation'
-                    WHEN Inflections.value LIKE :query THEN 'Inflection'
-                    WHEN Compounds.clean_value LIKE :query THEN 'Compound'
-                    WHEN Derivations.value LIKE :query THEN 'Derivations'
-                    WHEN Variants.value LIKE :query THEN 'Variants'
-                    ELSE NULL
-                END AS key
+                Matches.value AS match,
+                Matches.key
             FROM Words
-            LEFT JOIN Translations ON Words.id = Translations.word_id
-            LEFT JOIN Inflections ON Words.id = Inflections.word_id
-            LEFT JOIN Compounds ON Words.id = Compounds.word_id
-            LEFT JOIN Derivations ON Words.id = Derivations.word_id
-            LEFT JOIN Variants ON Words.id = Variants.word_id
-            WHERE Words.clean_value LIKE :query
-            OR Translations.value LIKE :query
-            OR Inflections.value LIKE :query
-            OR Compounds.clean_value LIKE :query
-            OR Derivations.value LIKE :query
-            OR Variants.value LIKE :query
+            LEFT JOIN Matches ON Words.id = Matches.word_id
+            WHERE Matches.value LIKE :query
             COLLATE NOCASE
     `
     const parameters = { "query": query + "%" }
@@ -129,28 +104,11 @@ function specificWord(req: Request, res: Response) {
     // the original website searches in the middle of translations but I don't think that's right
     // e.g. "road" finds "avfart" because the translation is "exit (road)"
     const sqlQuery = `
-        SELECT DISTINCT Words.*,
-        CASE 
-            WHEN Words.clean_value = :word THEN 'Word'
-            WHEN Translations.value = :word THEN 'Translation'
-            WHEN Inflections.value = :word THEN 'Inflection'
-            WHEN Compounds.clean_value = :word THEN 'Compound'
-            WHEN Derivations.value = :word THEN 'Derivations'
-            WHEN Variants.value = :word THEN 'Variants'
-            ELSE NULL
-        END AS key
+        SELECT DISTINCT 
+            Words.*, Matches.key AS key
         FROM Words
-        LEFT JOIN Translations ON Words.id = Translations.word_id
-        LEFT JOIN Inflections ON Words.id = Inflections.word_id
-        LEFT JOIN Compounds ON Words.id = Compounds.word_id
-        LEFT JOIN Derivations ON Words.id = Derivations.word_id
-        LEFT JOIN Variants ON Words.id = Variants.word_id
-        WHERE Words.clean_value = :word
-        OR Translations.value = :word
-        OR Inflections.value = :word
-        OR Compounds.clean_value = :word
-        OR Derivations.value = :word
-        OR Variants.value = :word
+        LEFT JOIN Matches ON Words.id = Matches.word_id
+        WHERE Matches.value = :word
         COLLATE NOCASE
     `
     const parameters = { "word": word }
