@@ -32,6 +32,8 @@ cursor.execute(
 CREATE TABLE Matches (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     word_id INTEGER NOT NULL,
+    word TEXT NOT NULL,
+    language TEXT NOT NULL,
     value TEXT NOT NULL,
     key TEXT NOT NULL,
     FOREIGN KEY (word_id) REFERENCES Words(id) ON DELETE CASCADE

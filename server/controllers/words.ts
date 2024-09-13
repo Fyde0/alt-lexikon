@@ -26,13 +26,12 @@ function searchWords(req: Request, res: Response) {
     // everything is without ( and ), clean_value is without |
     let sqlQuery = `
             SELECT DISTINCT
-                Words.value AS word, 
-                Words.language, 
-                Matches.value AS match,
-                Matches.key
-            FROM Words
-            LEFT JOIN Matches ON Words.id = Matches.word_id
-            WHERE Matches.value LIKE :query
+                word, 
+                language, 
+                value AS match,
+                key
+            FROM Matches
+            WHERE value LIKE :query
             COLLATE NOCASE
     `
     const parameters = { "query": query + "%" }
@@ -67,11 +66,14 @@ function searchWords(req: Request, res: Response) {
     // only keep result if there isn't a word match
     // e.g. "skärm" => remove all the translations like screen and shield
     // since there is already the exact match "skärm"
+    // or if there isn't already a match for the same word
+    // e.g. "bil" => remove all non word matches, like bilen, bilar etc.
+    // since there is already the word match "bil"
     // this can probably be done in SQL?
     const filteredResults = results.filter((res, _i, results) => {
-        // check if there is a word match
+        // check if there is a word match or a match for the same word
         const wordMatch = results.some(result => {
-            if (result.match === res.match && result.key === "Word") {
+            if ((result.match === res.match || result.word === res.word) && result.key === "Word") {
                 return true
             }
         })

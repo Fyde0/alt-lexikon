@@ -47,11 +47,16 @@ for word in root:
 
     rest = defaultdict(list)
 
+    # base word data
+    wordData = {"word": word.get("value"), "language": word.get("lang")}
+
     matches = []
-    matches.append({"value": word.get("value").replace("|", ""), "key": "Word"})
+    # base word match (clean value)
+    newMatch = {"value": word.get("value").replace("|", ""), "key": "Word"}
+    newMatch.update(wordData)
+    matches.append(newMatch)
 
     for child in word:
-
         # separate match table for search
 
         # Translations
@@ -80,27 +85,37 @@ for word in root:
                 values.append(value3)
 
             for value in values:
-                matches.append({"value": value, "key": "Translation"})
+                newMatch = {"value": value, "key": "Translation"}
+                newMatch.update(wordData) # add base word data
+                matches.append(newMatch)
 
         # Compounds
         if child.tag == "compound":
             cleanValue = child.get("value").replace("|", "")
-            matches.append({"value": cleanValue, "key": "Compound"})
+            newMatch = {"value": cleanValue, "key": "Compound"}
+            newMatch.update(wordData) # add base word data
+            matches.append(newMatch)
 
         # Inflections
         if child.tag == "paradigm":
             for paradigmChild in child:
                 if paradigmChild.tag == "inflection":
-                    matches.append({"value": paradigmChild.get("value"), "key": "Inflection"})
+                    newMatch = {"value": paradigmChild.get("value"), "key": "Inflection"}
+                    newMatch.update(wordData) # add base word data
+                    matches.append(newMatch)
 
 
         # Derivations
         if child.tag == "derivation":
-            matches.append({"value": child.get("value"), "key": "Derivation"})
+            newMatch = {"value": child.get("value"), "key": "Derivation"}
+            newMatch.update(wordData) # add base word data
+            matches.append(newMatch)
 
         # Variants
         if child.tag == "variant":
-            matches.append({"value": child.get("value"), "key": "Variant"})
+            newMatch = {"value": child.get("value"), "key": "Variant"}
+            newMatch.update(wordData) # add base word data
+            matches.append(newMatch)
 
         # all data also in main table for client
         newChild = defaultdict(list)
