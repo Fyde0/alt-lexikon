@@ -13,9 +13,18 @@ function Root() {
     const [areSettingsOpen, { open: openSettings, close: closeSettings }] = useDisclosure(false)
 
     const maxWidth = "750px"
+
+    // things used to calculate conditional input position
     const headerHeight = 60
     const inputHeight = "calc(2.25rem * var(--mantine-scale)"
     const inputMarginY = "var(--mantine-spacing-md)"
+
+    // Page title
+    let title = "Alt-Lexikon"
+    if (word) {
+        title += " - " + word
+    }
+    document.title = title
 
     return (
         <AppShell
