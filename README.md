@@ -1,12 +1,12 @@
 ## Alt-Lexikon
 
-Alt-Lexikon is an alternative frontend for [The People's Dictionary](https://folkets-lexikon.csc.kth.se/ "The People's Dictionary"), a English-Swedish and Swedish-English dictionary expanded and improved by its users.
+Alt-Lexikon is an alternative frontend for [The People's Dictionary](https://folkets-lexikon.csc.kth.se/ "The People's Dictionary") (Folkets lexikon). 
 
 You can use alt-lexikon [here](https://dev.flere.pw/lexikon/ "here"), or you can self host it (read below).
 
 ### Screenshots
 
-| Desktop, dark mode | Mobile, light mode | Mobile ,settings
+| Desktop, dark mode | Mobile, light mode | Mobile, settings
 | - | - | - |
 | ![](/screenshots/desktop-dark.jpg?raw=true) | ![](/screenshots/mobile-light.jpg?raw=true) | ![](/screenshots/mobile-dark-settings.jpg?raw=true)
 
@@ -24,4 +24,4 @@ python3 createDB.py words.db
 python3 XMLToSQLite.py folkets_sv_en_public.xml words.db
 python3 XMLToSQLite.py folkets_en_sv_public.xml words.db
 ```
-Then, you can build and run both the server and the client like normal Node apps, look in the .env.empty files for the environment variables the you need to set.
+Then, you can build and run both the server and the client like normal Node apps, look in the .env.empty files for the environment variables that you need to set.
