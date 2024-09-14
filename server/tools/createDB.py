@@ -12,6 +12,9 @@ args = parser.parse_args()
 conn = sqlite3.connect(args.dest_file)
 cursor = conn.cursor()
 
+# Main table with word data
+# Everything except base data is stored in JSON in one column
+# (only needed in client)
 cursor.execute(
     """
 CREATE TABLE IF NOT EXISTS Words (
@@ -27,6 +30,8 @@ CREATE TABLE IF NOT EXISTS Words (
 
 cursor.execute("CREATE INDEX idx_word_id ON Words(id)")
 
+# Table for "matches", this is exclusively for search suggestions
+# more info in the other file
 cursor.execute(
     """
 CREATE TABLE Matches (

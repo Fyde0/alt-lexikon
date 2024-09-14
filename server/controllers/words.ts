@@ -12,6 +12,7 @@ function searchWords(req: Request, res: Response) {
     const { query } = req.query
     logDebug("Searching query: " + query)
 
+    logDebug("Validating query: " + query)
     const validationResult = queryValidationSchema.safeParse({ query })
 
     if (!validationResult.success) {
@@ -23,7 +24,8 @@ function searchWords(req: Request, res: Response) {
     // search query
     // returns word, language, match and key of match
     // e.g. tog => ta / sv / tog / inflection
-    // everything is without ( and ), clean_value is without |
+    // everything is without ( and ), value is without |
+    // see /server/tools/XMLToSQLite.py for more info
     let sqlQuery = `
             SELECT DISTINCT
                 word, 
@@ -54,7 +56,7 @@ function searchWords(req: Request, res: Response) {
         // exact word match first
         if (a.match === query && a.key === "Word") return -1
         if (b.match === query && b.key === "Word") return 1
-        // then, other exact match
+        // then, other exact match (eg variants, inflections, etc)
         if (a.match === query) return -1
         if (b.match === query) return 1
         // then, shorter first
@@ -63,13 +65,13 @@ function searchWords(req: Request, res: Response) {
 
     logDebug("Filtering results for query: " + query)
 
-    // only keep result if there isn't a word match
+    // keep result if 1) there isn't a word match for the same word
     // e.g. "skärm" => remove all the translations like screen and shield
     // since there is already the exact match "skärm"
-    // or if there isn't already a match for the same word
-    // e.g. "bil" => remove all non word matches, like bilen, bilar etc.
+    // or 2) if there isn't already a match for the same word
+    // e.g. "bil" => remove all non word matches, like bilen (inflection)
     // since there is already the word match "bil"
-    // this can probably be done in SQL?
+    // this can probably be done in SQL? but maybe it's slower
     const filteredResults = results.filter((res, _i, results) => {
         // check if there is a word match or a match for the same word
         const wordMatch = results.some(result => {
@@ -94,6 +96,7 @@ function specificWord(req: Request, res: Response) {
     const { word } = req.params
     logDebug("Getting word: " + word)
 
+    logDebug("Validating word: " + word)
     const validationResult = queryValidationSchema.safeParse({ word })
 
     if (!validationResult.success) {

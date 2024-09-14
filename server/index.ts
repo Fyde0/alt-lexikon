@@ -7,20 +7,22 @@ import { rateLimit } from 'express-rate-limit'
 import { logDebug, logInfo } from "./helpers/log"
 import searchController from "./controllers/words"
 
-// TODO debug logs
+logDebug("Starting")
 
 const app = express()
-const port = process.env.PORT || "3000"
+const port = process.env.PORT || "3000" // default port
 
 // Fake delay
 // app.use((req: Request, res: Response, next: NextFunction) => {
 //     setTimeout(next, 1000)
 // })
 
-app.use(cors())
-app.use(helmet())
-app.disable('x-powered-by')
-// Trust proxy on local network (reverse proxy)
+logDebug("Settings things up")
+
+app.use(cors()) // this is not needed if client and server are on the same domain
+app.use(helmet()) // security stuff
+app.disable('x-powered-by') // disable Express header
+// trust proxy on local network (reverse proxy)
 app.set("trust proxy", "loopback")
 
 // rate limiter, 100 requests per minute
@@ -30,7 +32,6 @@ const limiter = rateLimit({
 	standardHeaders: 'draft-7',
 	legacyHeaders: false
 })
-
 app.use(limiter)
 
 // open db
@@ -39,7 +40,7 @@ logDebug("Opening database file")
 const db_file = process.env.DB_FILE || "words.db"
 const file_db = new Database(db_file, { readonly: true })
 
-// DON'T DO THIS
+// DON'T DO THIS, it breaks the memory db
 // file_db.pragma("journal_mode = WAL")
 
 // copy db to memory
@@ -55,6 +56,8 @@ app.use((req: Request, res: Response, next: NextFunction) => {
     next()
 })
 
+logDebug("Setting up routes")
+
 // routes
 app.get("/words", searchController.searchWords)
 app.get("/words/:word", searchController.specificWord)
@@ -63,6 +66,8 @@ app.get("/words/:word", searchController.specificWord)
 app.use((req, res, next) => {
     res.status(404).send("¯\\(º_o)/¯")
 })
+
+logDebug("Listening")
 
 app.listen(port, () => {
     logInfo("Server listening on port " + port)

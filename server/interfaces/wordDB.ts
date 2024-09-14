@@ -6,7 +6,7 @@ interface IWordDB {
     class: string | null,
     comment: string | null,
     rest: string | null,
-    key?: string
+    key?: string // created in SQL query
 }
 
 export function isIWordDB(obj: any): obj is IWordDB {
