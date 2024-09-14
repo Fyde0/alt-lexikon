@@ -51,8 +51,8 @@ for word in root:
 
     # making "matches", matches are searchable things: words, inflections, etc.
     # matches are connected to their original word with its base data (value and language)
-    # to properly display them in the search field
-    wordData = {"word": word.get("value"), "language": word.get("lang")}
+    # to properly display them in the search field (clean value, no |)
+    wordData = {"word": word.get("value").replace("|", ""), "language": word.get("lang")}
 
     matches = []
 
