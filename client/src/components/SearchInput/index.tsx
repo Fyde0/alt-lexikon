@@ -36,6 +36,17 @@ function SearchInput({ word }: { word: string | undefined }) {
         combobox.selectFirstOption()
     }, [searchQuery.data])
 
+    // on focus listener
+    window.addEventListener("focus", () => {
+        // focus the search input when the window is focused
+        // this needs a delay for some reason
+        if (settings.focusInputOnWindowFocus) {
+            setTimeout(() => {
+                form.getInputNode("query")?.focus()
+            }, 10)
+        }
+    })
+
     function handleSubmit(word: string) {
         if (!searchQuery.isError && queryValidation.success) {
             combobox.closeDropdown()
@@ -57,7 +68,7 @@ function SearchInput({ word }: { word: string | undefined }) {
 
                     {/* Text input */}
                     <Grid.Col span="auto">
-                        <Combobox.Target >
+                        <Combobox.Target>
                             <TextInput
                                 key={form.key("query")}
                                 {...form.getInputProps("query")}
@@ -70,7 +81,7 @@ function SearchInput({ word }: { word: string | undefined }) {
                                 onFocus={(event) => {
                                     // selects the content when focused
                                     // (useful when autofocus)
-                                    if (settings.selectQueryAfterSearch) {
+                                    if (settings.selectQueryOnFocus) {
                                         event.currentTarget.select()
                                     }
                                     // opens the dropdown when focused

@@ -4,7 +4,8 @@ interface ISettings {
     expandResults: boolean,
     searchOnBottom: boolean,
     showCharactersButtons: boolean,
-    selectQueryAfterSearch: boolean,
+    focusInputOnWindowFocus: boolean,
+    selectQueryOnFocus: boolean,
     doubleClickToSearch: boolean
 }
 
@@ -14,7 +15,8 @@ export const defaultSettings: ISettings = {
     expandResults: false,
     searchOnBottom: false,
     showCharactersButtons: false,
-    selectQueryAfterSearch: false,
+    focusInputOnWindowFocus: true,
+    selectQueryOnFocus: false,
     doubleClickToSearch: true
 }
 

@@ -71,7 +71,9 @@ function Root() {
                         blur: 3,
                     }}
                 >
-                    <Settings />
+                    <Box maw="32rem">
+                        <Settings />
+                    </Box>
                 </Modal>
 
                 {/* Fixed search input */}

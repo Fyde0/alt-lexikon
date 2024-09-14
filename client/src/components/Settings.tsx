@@ -33,14 +33,20 @@ function Settings() {
                 onChange={() => setSettings({ ...settings, showCharactersButtons: !settings.showCharactersButtons })}
             />
             <Checkbox
-                label="Select query after search"
-                description="Automatically selects the text in the search field after searching"
-                checked={settings.selectQueryAfterSearch}
-                onChange={() => setSettings({ ...settings, selectQueryAfterSearch: !settings.selectQueryAfterSearch })}
+                label="Focus input on window focus"
+                description="Automatically focuses the search input on window focus (e.g. when you come back from a different tab)"
+                checked={settings.focusInputOnWindowFocus}
+                onChange={() => setSettings({ ...settings, focusInputOnWindowFocus: !settings.focusInputOnWindowFocus })}
+            />
+            <Checkbox
+                label="Select query on focus"
+                description="Automatically selects the text in the search field on focus (e.g. after displaying results, or when focusing the window if the option above is enabled)"
+                checked={settings.selectQueryOnFocus}
+                onChange={() => setSettings({ ...settings, selectQueryOnFocus: !settings.selectQueryOnFocus })}
             />
             <Checkbox
                 label="Double click to search"
-                description="Search a word when double clicking it in the results screen"
+                description="Searches a word when double clicking it in the results screen"
                 checked={settings.doubleClickToSearch}
                 onChange={() => setSettings({ ...settings, doubleClickToSearch: !settings.doubleClickToSearch })}
             />
