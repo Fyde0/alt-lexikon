@@ -25,3 +25,10 @@ python3 XMLToSQLite.py folkets_sv_en_public.xml words.db
 python3 XMLToSQLite.py folkets_en_sv_public.xml words.db
 ```
 Then, you can build and run both the server and the client like normal Node apps, look in the .env.empty files for the environment variables that you need to set.
+
+### Debug
+
+You can run the server with the `NODE_DEBUG` environment variable set to `lexikon` to pring debug messages:
+```bash
+NODE_DEBUG=lexikon npm run dev
+```
