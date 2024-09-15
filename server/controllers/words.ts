@@ -3,22 +3,24 @@ import { Request, Response } from "express"
 import { mem_db } from ".."
 import { serverError } from "../helpers/serverError"
 import { logDebug } from "../helpers/log"
-import queryValidationSchema from "../helpers/queryValidationSchema"
 import { isIMatchArray } from "../interfaces/match"
 import { isIWordDBArray } from "../interfaces/wordDB"
 import IWord from "../interfaces/word"
+import validateQuery from "../helpers/validateQuery"
 
 function searchWords(req: Request, res: Response) {
     const { query } = req.query
     logDebug("Searching query: " + query)
 
     logDebug("Validating query: " + query)
-    const validationResult = queryValidationSchema.safeParse({ query })
+
+    // min length 3
+    const validationResult = validateQuery(query, 3)
 
     if (!validationResult.success) {
         // 422 Unprocessable Content
         logDebug("Validation failed for query: " + query)
-        return res.status(422).json({ "error": validationResult.error.issues[0].message })
+        return res.status(422).json({ "error": validationResult.message })
     }
 
     // search query
@@ -97,12 +99,12 @@ function specificWord(req: Request, res: Response) {
     logDebug("Getting word: " + word)
 
     logDebug("Validating word: " + word)
-    const validationResult = queryValidationSchema.safeParse({ word })
+    const validationResult = validateQuery(word)
 
     if (!validationResult.success) {
         // 422 Unprocessable Content
         logDebug("Validation failed for query: " + word)
-        return res.status(422).json({ "error": validationResult.error.issues[0].message })
+        return res.status(422).json({ "error": validationResult.message })
     }
 
     // search query
