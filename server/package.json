@@ -1,6 +1,6 @@
 {
   "name": "lexikon-server",
-  "version": "0.0.0",
+  "version": "1.0.0",
   "main": "index.ts",
   "scripts": {
     "dev": "npm run type-check && tsx watch --clear-screen=false index.ts",
@@ -12,8 +12,7 @@
     "cors": "^2.8.5",
     "express": "^4.19.2",
     "express-rate-limit": "^7.4.0",
-    "helmet": "^7.1.0",
-    "zod": "^3.23.8"
+    "helmet": "^7.1.0"
   },
   "devDependencies": {
     "@types/better-sqlite3": "^7.6.11",
