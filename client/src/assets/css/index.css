@@ -87,3 +87,18 @@ a:hover {
 a:active {
     color: var(--mantine-primary-color-filled-hover);
 }
+
+.dimmedA {
+    color: var(--mantine-color-dimmed);
+    text-decoration-color: var(--mantine-color-dimmed);
+}
+
+.dimmedA:hover {
+    color: var(--mantine-primary-color-filled);
+    text-decoration-color: inherit;
+}
+
+.dimmedA:active {
+    color: var(--mantine-primary-color-filled-hover);
+    text-decoration-color: inherit;
+}

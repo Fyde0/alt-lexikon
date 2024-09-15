@@ -103,9 +103,12 @@ function Settings() {
                     </Combobox.Dropdown>
                 </Combobox>
             </Text>
-            <Text size="sm" c="dimmed" ml="auto">
-                {import.meta.env.MODE === "development" && "alt-lexikon dev mode (v" + __APP_VERSION__ + ")"}
-                {import.meta.env.MODE === "production" && "alt-lexikon v" + __APP_VERSION__}
+
+            <Text size="sm" ml="auto">
+                <a className="dimmedA" href="https://github.com/Fyde0/alt-lexikon/releases" target="_blank">
+                    {import.meta.env.MODE === "development" && "alt-lexikon dev mode (v" + __APP_VERSION__ + ")"}
+                    {import.meta.env.MODE === "production" && "alt-lexikon v" + __APP_VERSION__}
+                </a>
             </Text>
         </Stack>
     )
