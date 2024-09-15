@@ -1,4 +1,7 @@
-import { Text, Checkbox, CheckIcon, ColorSwatch, Group, rem, Stack, useComputedColorScheme, useMantineColorScheme, DEFAULT_THEME, useCombobox, Combobox, InputBase } from "@mantine/core"
+import {
+    Text, Checkbox, CheckIcon, ColorSwatch, Group, rem, Stack, useComputedColorScheme,
+    useMantineColorScheme, DEFAULT_THEME, useCombobox, Combobox, InputBase
+} from "@mantine/core"
 import useSettingsStore from "../stores/settings"
 import { accentColors, Font, fonts } from "../interfaces/settings"
 
@@ -68,10 +71,9 @@ function Settings() {
                     })}
                 </Group>
             </Text>
-
             <Text component="label">Font
                 <Combobox
-                    store={combobox} withinPortal={false}
+                    store={combobox}
                     onOptionSubmit={(value) => {
                         setSettings({ ...settings, font: value as Font || DEFAULT_THEME.fontFamily })
                     }}
@@ -100,6 +102,10 @@ function Settings() {
                         </Combobox.Options>
                     </Combobox.Dropdown>
                 </Combobox>
+            </Text>
+            <Text size="sm" c="dimmed" ml="auto">
+                {import.meta.env.MODE === "development" && "alt-lexikon dev mode (v" + __APP_VERSION__ + ")"}
+                {import.meta.env.MODE === "production" && "alt-lexikon v" + __APP_VERSION__}
             </Text>
         </Stack>
     )

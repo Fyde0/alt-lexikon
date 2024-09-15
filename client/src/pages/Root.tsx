@@ -15,7 +15,7 @@ function Root() {
     const maxWidth = "750px"
 
     // things used to calculate conditional input position
-    const headerHeight = 60
+    const headerHeight = "3.75rem"
     const inputHeight = "calc(2.25rem * var(--mantine-scale)"
     const inputMarginY = "var(--mantine-spacing-md)"
 

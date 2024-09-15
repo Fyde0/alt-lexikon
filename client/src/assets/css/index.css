@@ -53,6 +53,29 @@
     /* Chrome 36+, Opera 23+, Firefox 39+, Safari 12+, iOS 10+ */
 }
 
+/* 
+in chrome the entire content shifts left when the scrollbar appears and all ways to fix it suck
+- overflow-y: scroll; always shows the scrollbar, ugly
+- scrollbar-gutter: stable; doesn't apply to certain components for annoying reasons
+    and makes the horizontal borders look bad, also it doesn't work on safari
+- setting padding-left: calc(100vw - 100%); or similars doesn't work with everything
+    and it messes up things that already have padding and or margin
+- width: 100vw; works but it shows the horizontal scrollbar which is ugly
+
+so I just used width: 100vw; and overflow-x: hidden; to hide the horizontal scrollbar
+since I don't need it here and I think it's not going to cause problems hopefully
+*/
+
+html,
+body {
+    overflow-x: hidden;
+}
+
+#root,
+.mantine-AppShell-header {
+    width: 100vw;
+}
+
 a {
     color: var(--mantine-color-text);
 }
