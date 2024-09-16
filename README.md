@@ -28,7 +28,7 @@ Then, you can build and run both the server and the client like normal Node apps
 
 ### Debug
 
-You can run the server with the `NODE_DEBUG` environment variable set to `lexikon` to pring debug messages:
+You can run the server with the `NODE_DEBUG` environment variable set to `lexikon` to print debug messages:
 ```bash
 NODE_DEBUG=lexikon npm run dev
 ```
