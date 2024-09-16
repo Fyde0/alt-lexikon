@@ -15,7 +15,14 @@ const useSettingsStore = create<SettingsState>()(
             setSettings: (settings) => set({ settings })
         }),
         {
-            name: "lexikon-settings"
+            name: "lexikon-settings",
+            version: 1,
+            migrate: (persistedState, version) => {
+                if (version === 0) {
+                    return { settings: defaultSettings }
+                }
+                return persistedState
+            }
         }
     )
 )
