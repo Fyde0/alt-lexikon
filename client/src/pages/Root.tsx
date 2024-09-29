@@ -32,7 +32,7 @@ function Root() {
             maw={maxWidth} mx="auto"
         >
 
-            <AppShell.Header style={{ boxShadow: "var(--mantine-shadow-md)" }}>
+            <AppShell.Header id="shellHeader" style={{ boxShadow: "var(--mantine-shadow-md)" }}>
                 <Group
                     h="100%" maw={maxWidth}
                     px="md" mx="auto"
@@ -77,7 +77,8 @@ function Root() {
                 </Modal>
 
                 {/* Fixed search input */}
-                <Portal>
+                {/* in the header for accessibility */}
+                <Portal target="#shellHeader">
                     <Flex
                         align="center" justify="center"
                         w="100vw" h={inputHeight + " + " + inputMarginY + " * 2"}
@@ -85,6 +86,7 @@ function Root() {
                         // conditional position based on settings
                         top={settings.searchOnBottom ? undefined : headerHeight}
                         bottom={settings.searchOnBottom ? 0 : undefined}
+                        left={0}
                         style={{
                             zIndex: 100,
                             backgroundColor: "var(--mantine-color-body)",

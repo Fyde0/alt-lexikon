@@ -1,12 +1,11 @@
 interface IValidateQueryReturn {
     success: boolean,
-    message: string
+    message?: string
 }
 
 function validateQuery(query?: string): IValidateQueryReturn {
-
     // empty query is valid
-    if (!query) return { success: true, message: "" }
+    if (!query) return { success: true }
 
     if (query.length > 50) {
         return { success: false, message: "The query is too long!" }
@@ -17,7 +16,7 @@ function validateQuery(query?: string): IValidateQueryReturn {
         return { success: false, message: "The query contains invalid characters!" };
     }
 
-    return { success: true, message: "" }
+    return { success: true }
 }
 
 export default validateQuery

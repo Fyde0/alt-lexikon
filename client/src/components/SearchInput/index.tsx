@@ -1,6 +1,6 @@
 import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { Button, Combobox, Grid, Loader, TextInput, useCombobox } from "@mantine/core";
+import { Button, Combobox, Grid, Loader, TextInput, useCombobox, VisuallyHidden } from "@mantine/core";
 import { useForm } from '@mantine/form';
 // 
 import { searchWords } from "../../api/words"
@@ -24,7 +24,6 @@ function SearchInput({ word }: { word: string | undefined }) {
     })
 
     // not using mantine's form validation because it's annoying
-    // const queryValidation = queryValidationSchema.safeParse({ query: form.values.query })
     const queryValidation = validateQuery(form.values.query)
 
     // search options query
@@ -73,7 +72,11 @@ function SearchInput({ word }: { word: string | undefined }) {
                                 key={form.key("query")}
                                 {...form.getInputProps("query")}
 
-                                placeholder="Search dictionary"
+                                // accessibility
+                                type="search"
+                                aria-label="Search dictionary"
+                                aria-invalid={(searchQuery.isError || !queryValidation.success) ? "true" : "false"}
+                                aria-errormessage="errorMessage"
 
                                 error={searchQuery.isError || !queryValidation.success}
                                 autoFocus={true}
@@ -96,6 +99,14 @@ function SearchInput({ word }: { word: string | undefined }) {
                                 rightSection={searchQuery.isFetching && <Loader size={18} />}
                             />
                         </Combobox.Target>
+
+                        {/* error for screen readers */}
+                        <VisuallyHidden
+                            id="errorMessage"
+                            role="alert" aria-live="polite"
+                        >
+                            {queryValidation.message || searchQuery.error?.message}
+                        </VisuallyHidden>
                     </Grid.Col>
 
                     {/* åäö buttons */}
