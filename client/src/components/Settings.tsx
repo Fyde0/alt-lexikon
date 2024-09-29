@@ -31,7 +31,7 @@ function Settings() {
                 onChange={() => setSettings({ ...settings, searchOnBottom: !settings.searchOnBottom })}
             />
             <Checkbox
-                label="Show åäö buttons"
+                label="Show Swedish characters buttons (åäö)"
                 checked={settings.showCharactersButtons}
                 onChange={() => setSettings({ ...settings, showCharactersButtons: !settings.showCharactersButtons })}
             />
@@ -64,6 +64,7 @@ function Settings() {
                                 color={"var(--mantine-color-" + color + "-filled)"}
                                 onClick={() => setSettings({ ...settings, accentColor: color })}
                                 style={{ color: "var(--mantine-color-text)", cursor: "pointer" }}
+                                aria-label={color}
                             >
                                 {settings.accentColor === color && <CheckIcon style={{ width: rem(12), height: rem(12) }} />}
                             </ColorSwatch>
@@ -77,6 +78,7 @@ function Settings() {
                     onOptionSubmit={(value) => {
                         setSettings({ ...settings, font: value as Font || DEFAULT_THEME.fontFamily })
                     }}
+                    withinPortal={false}
                 >
                     <Combobox.Target>
                         <InputBase
@@ -92,7 +94,10 @@ function Settings() {
                     <Combobox.Dropdown>
                         <Combobox.Options>
                             {fonts.map((item) => (
-                                <Combobox.Option value={item} key={item}>
+                                <Combobox.Option
+                                    value={item} key={item}
+                                    aria-selected={item === settings.font}
+                                >
                                     <Group gap="xs">
                                         {item === settings.font && <CheckIcon size={12} />}
                                         <Text span ff={item}>{item}</Text>
