@@ -73,7 +73,7 @@ function SearchInput({ word }: { word: string | undefined }) {
                                 {...form.getInputProps("query")}
 
                                 // accessibility
-                                type="search"
+                                // type="search" <-- breaks accessibility
                                 aria-label="Search dictionary"
                                 aria-invalid={(searchQuery.isError || !queryValidation.success) ? "true" : "false"}
                                 aria-errormessage="errorMessage"
