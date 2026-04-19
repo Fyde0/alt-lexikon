@@ -4,10 +4,11 @@ import { useDisclosure } from "@mantine/hooks";
 // 
 import IWord from "../../interfaces/word";
 import { fullClasses } from "../../interfaces/class";
-import { handleEntry, handleParenthesis, handleTranslations } from "./helpers/word";
+import { handleParenthesis, handleTranslations } from "./helpers/word";
 import Links from "./Links";
-import EntryList from "./EntryList";
 import useSettingsStore from "../../stores/settings";
+import Flag from "./Flag";
+import Entry from "./Entry";
 
 function Word({ word }: { word: IWord }) {
     const { settings } = useSettingsStore()
@@ -18,28 +19,13 @@ function Word({ word }: { word: IWord }) {
 
     // ignoring the url property since it only has sfw files 🪦
 
-    const flag = word.language === "en" ? "🇬🇧" : "🇸🇪"
-    const otherFlag = word.language === "en" ? "🇸🇪" : "🇬🇧"
-    const classes = word.class?.split(", ").map((item) => fullClasses[item] || item)
-    const translations = word.data?.translation
-    const grammar = handleEntry(word.data?.grammar)
-    const definitions = handleEntry(word.data?.definition, otherFlag)
-
     // not really sure what the level is
     // level is also ignored in the original website
-    const synonyms = handleEntry(word.data?.synonym)
-    const examples = handleEntry(word.data?.example, otherFlag, true)
-    const idioms = handleEntry(word.data?.idiom, otherFlag, true)
 
-    // I think there's always only one explanation
-    // but just to be sure, treat as an array
-    const explanation = handleEntry(word.data?.explanation, otherFlag)
-
-    // some compounds have comments but it looks like they're not supposed to
-    // the comments are not displayed in the original website
-    const compounds = handleEntry(word.data?.compound, otherFlag, true)
-    const derivations = handleEntry(word.data?.derivation, otherFlag, true)
-    const use = handleEntry(word.data?.use)
+    const language = word.language === "en" ? "English" : "Swedish"
+    const otherLanguage = word.language === "en" ? "Swedish" : "English"
+    const classes = word.class?.split(", ").map((item) => fullClasses[item] || item)
+    const translations = word.data?.translation
 
     // doesn't have comments
     // this is not IPA, I don't know what it is, I'm not using it
@@ -59,9 +45,9 @@ function Word({ word }: { word: IWord }) {
         return variant
     }).join(", ")
 
-    const inflections = word.data?.paradigm?.map(para => {
-        return handleEntry(para.inflection)
-    }).join(", ")
+    const inflections = word.data?.paradigm?.map((para, index) => {
+        return <Entry key={index} entry={para.inflection} />
+    })
 
     const see = word.data?.see?.filter(see => {
         // animation and phonetic are sfw files 🪦
@@ -90,13 +76,13 @@ function Word({ word }: { word: IWord }) {
 
                 {/* Word, flags, classes, comments and translations */}
                 <Grid.Col span="auto">
-                    {flag} {" "}
+                    <Flag language={language} /> {" "}
                     <Text span fw={700}>{word.value}</Text> {" "}
                     {classes}
                     {word.comment && " (" + word.comment + ")"}
                     {translations &&
                         <>
-                            {", "} {otherFlag} {" "}
+                            {", "} <Flag language={otherLanguage} /> {" "}
                             {translations.map((trans, i) => (
                                 <span key={i}>
                                     {/* Prepend comma to items, 0 is false so the first item has no comma */}
@@ -136,19 +122,22 @@ function Word({ word }: { word: IWord }) {
             {word.data && Object.keys(word.data).some(key => key !== "translation") &&
                 <Collapse in={opened}>
                     <Box mt="md">
-                        {grammar && <Text>Grammar: {grammar}</Text>}
+                        {word.data?.grammar && <Text>Grammar: <Entry entry={word.data?.grammar} /></Text>}
                         {pronunciations && <Text>Pronunciation: {pronunciationLink}</Text>}
-                        {explanation && <Text>Explanation: {explanation}</Text>}
+                        {/* I think there's always only one explanation, but just to be sure, treat as an array */}
+                        {word.data?.explanation && <Text>Explanation: <Entry entry={word.data?.explanation} flagLanguage={otherLanguage} /></Text>}
                         {variants && <Text>Variants: {variants}</Text>}
                         {see && see.length > 0 && <Text>See: {" "} <Links links={see} /></Text>}
                         {inflections && <Text>Inflections: {inflections}</Text>}
-                        {use && <Text>Use: {use}</Text>}
-                        {synonyms && <Text>Synonyms: {synonyms}</Text>}
-                        {definitions && <Text>Definition: {definitions}</Text>}
-                        {derivations && <><Text>Derivations: </Text><EntryList entries={derivations} /></>}
-                        {examples && <><Text>Examples: </Text><EntryList entries={examples} /></>}
-                        {idioms && <><Text>Idioms: </Text><EntryList entries={idioms} /></>}
-                        {compounds && <><Text>Compounds: </Text><EntryList entries={compounds} /></>}
+                        {word.data?.use && <Text>Use: <Entry entry={word.data?.use} /></Text>}
+                        {word.data?.synonym && <Text>Synonyms: <Entry entry={word.data?.synonym} /></Text>}
+                        {word.data?.definition && <><Text>Definition: <Entry entry={word.data?.definition} flagLanguage={otherLanguage} /></Text></>}
+                        {word.data?.derivation && <><Text>Derivations: </Text><Entry entry={word.data?.derivation} flagLanguage={otherLanguage} asList /></>}
+                        {word.data?.example && <><Text>Examples: </Text><Entry entry={word.data?.example} flagLanguage={otherLanguage} asList /></>}
+                        {word.data?.idiom && <><Text>Idioms: </Text><Entry entry={word.data?.idiom} flagLanguage={otherLanguage} asList /></>}
+                        {/* some compounds have comments but it looks like they're not supposed to
+                        the comments are not displayed in the original website */}
+                        {word.data?.compound && <><Text>Compounds: </Text><Entry entry={word.data?.compound} flagLanguage={otherLanguage} asList /></>}
                         {related && <Text>Related: {related}</Text>}
                     </Box>
                 </Collapse>

@@ -45,7 +45,7 @@ export type WordDataEntryWithInflection = WordDataEntry & {
 }
 
 type WordDataEntryWithTypeAndTranslation = WordDataEntryWithType & WordDataEntryWithTranslation
-type WordDataEntryWithInflectionAndTranslation = WordDataEntryWithInflection & WordDataEntryWithTranslation
+export type WordDataEntryWithInflectionAndTranslation = WordDataEntryWithInflection & WordDataEntryWithTranslation
 
 type Variant = WordDataEntry & {
     alt?: string
